@@ -20802,13 +20802,13 @@
         "entry_epoch": 1784531880,
         "entry_time": "12:48",
         "entry_price": 565.4,
-        "exit_price": null,
-        "exit_time": null,
-        "exit_reason": null,
-        "pnl": 0.0
+        "exit_price": 492.1,
+        "exit_time": "15:01",
+        "exit_reason": "End of Day Market Close",
+        "pnl": 4764.499999999997
       }
     ],
-    "day_pnl": 1433.249999999997,
+    "day_pnl": 6197.7499999999945,
     "num_baskets_deployed": 2
   }
 ]
