@@ -1,10 +1,22 @@
 """
-Core backtest engine - 3-straddle BASKET strategy with ATR Trailing Stop.
+Core backtest engine - 3-straddle BASKET strategy.
 
-Key Features:
-- First Entry at 09:45 if price < VWAP.
-- Fresh downward crossings (was >= VWAP, now < VWAP) deploy new baskets.
-- Exits when price > VWAP OR when ATR Trailing Stop is hit OR at 15:15 IST.
+Strategy recap
+--------------
+1. At 09:45 IST, sample Nifty spot, round to nearest 100 (both directions) to
+   fix the ATM strike for the day. Two more strikes are derived from it:
+   ATM-100 and ATM+100 (config.STRIKE_OFFSETS). Three straddles = 6 option legs.
+2. Build the COMBINED price series = sum of all 6 legs' 1-min close prices,
+   and its combined volume = sum of all 6 legs' volumes. Compute the
+   cumulative VWAP of this combined series starting from market open (09:15).
+3. From 09:45 onward, every time the combined price makes a FRESH downward
+   crossing of its own VWAP (was >= VWAP, now < VWAP), SELL one full basket:
+   1 lot each of ATM-100 straddle, ATM straddle, ATM+100 straddle (6 legs,
+   1 lot each). This can fire multiple times per day - exposure compounds
+   with each fresh cross (config.MAX_BASKETS_PER_DAY caps it if set).
+4. All open baskets are squared off together at 15:15 IST (pure time exit).
+
+No numpy / pandas - pure python throughout.
 """
 
 from src.ist_time import ist_datetime, ist_to_epoch, epoch_to_ist_time_str
@@ -13,52 +25,76 @@ from src.expiry_utils import round_to_nearest_strike, build_option_symbol
 import config
 
 
-def compute_basket_atr(merged_series, period=14):
-    """
-    Computes ATR on the merged basket price series.
-    True Range for short basket = max(High-Low, abs(High-PrevClose), abs(Low-PrevClose))
-    Since 1-min candles in merge series only have close prices, High/Low are estimated.
-    """
-    atr_values = []
-    prices = [bar["price"] for bar in merged_series]
-    
-    for i in range(len(prices)):
-        if i < period:
-            # Fallback estimation for initial bars: 1% of basket price as baseline volatility
-            atr_values.append(prices[i] * 0.01)
-            continue
-            
-        # Calculate Average True Range over period
-        tr_list = [abs(prices[j] - prices[j-1]) for j in range(i - period + 1, i + 1)]
-        atr = sum(tr_list) / period
-        atr_values.append(atr)
-        
-    return atr_values
+def _find_spot_at(candles, target_epoch):
+    """Find the candle closest to (but not after) target_epoch; fall back to
+    the first candle at/after it if none precede it."""
+    before = [c for c in candles if c["epoch"] <= target_epoch]
+    if before:
+        return before[-1]
+    after = [c for c in candles if c["epoch"] > target_epoch]
+    return after[0] if after else None
 
 
-def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=2.0):
+def merge_basket_series(leg_candles_by_symbol):
     """
-    atr_multiplier: 2.0 provides a good balance between avoiding noise stop-outs
-                   and protecting peak profits.
+    leg_candles_by_symbol: dict of symbol -> list of candle dicts (6 entries:
+    3 strikes x CE/PE).
+
+    Merge on epochs common to ALL 6 legs into a combined basket series:
+        [{"epoch", "price" (sum of 6 closes), "volume" (sum of 6 volumes),
+          "legs": {symbol: close, ...}}, ...]
+    Timestamps missing from any single leg are dropped (illiquid/missing minute).
+    """
+    symbols = list(leg_candles_by_symbol.keys())
+    by_epoch = {sym: {c["epoch"]: c for c in candles}
+                for sym, candles in leg_candles_by_symbol.items()}
+
+    if not symbols:
+        return []
+
+    common_epochs = set(by_epoch[symbols[0]].keys())
+    for sym in symbols[1:]:
+        common_epochs &= set(by_epoch[sym].keys())
+
+    merged = []
+    for epoch in sorted(common_epochs):
+        total_price = 0.0
+        total_vol = 0
+        legs = {}
+        for sym in symbols:
+            c = by_epoch[sym][epoch]
+            total_price += c["close"]
+            total_vol += c.get("volume") or 0
+            legs[sym] = c["close"]
+        merged.append({"epoch": epoch, "price": total_price, "volume": total_vol, "legs": legs})
+
+    return merged
+
+
+def run_day_backtest(trade_date_str, fyers_client):
+    """
+    Run the basket strategy for a single trading day.
+    Returns a dict describing the day's result, or None if the day should be
+    skipped entirely (no underlying data at all - holiday/no session).
     """
     lot_size = config.get_lot_size(trade_date_str)
     qty_per_leg = config.LOTS_PER_LEG_PER_BASKET * lot_size
 
-    # --- 1. Fetch Spot & Fix Strikes ---
+    # --- 1. Spot at 09:45, fix ATM + the two wing strikes -------------------
     spot_candles = fyers_client.get_day_candles(config.UNDERLYING_SYMBOL, trade_date_str)
     if not spot_candles:
         return None
 
     fix_epoch = ist_to_epoch(ist_datetime(trade_date_str, config.STRIKE_FIX_TIME))
-    spot_bar = next((c for c in reversed(spot_candles) if c["epoch"] <= fix_epoch), None)
+    spot_bar = _find_spot_at(spot_candles, fix_epoch)
     if spot_bar is None:
         return None
 
     atm_strike = round_to_nearest_strike(spot_bar["close"])
     strikes = sorted(atm_strike + off for off in config.STRIKE_OFFSETS)
 
-    # --- 2. Build Option Symbols & Fetch Candles ---
-    leg_symbols = {}
+    # --- 2. Build all 6 option symbols, fetch candles ------------------------
+    leg_symbols = {}       # symbol -> (strike, opt_type)
     expiry_date = None
     for strike in strikes:
         for opt_type in ("CE", "PE"):
@@ -84,134 +120,80 @@ def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=2.0):
     }
 
     if missing:
-        return {**base_info, "error": f"missing_option_data: {', '.join(missing)}", "series": [], "entries": [], "day_pnl": 0.0}
+        return {
+            **base_info,
+            "error": f"missing_option_data: {', '.join(missing)}",
+            "series": [],
+            "entries": [],
+            "day_pnl": 0.0,
+        }
 
-    # Merge into basket series
-    symbols = list(leg_candles_by_symbol.keys())
-    by_epoch = {sym: {c["epoch"]: c for c in candles} for sym, candles in leg_candles_by_symbol.items()}
-    common_epochs = set.intersection(*(set(by_epoch[sym].keys()) for sym in symbols)) if symbols else set()
-
-    merged = []
-    for epoch in sorted(common_epochs):
-        total_price = sum(by_epoch[sym][epoch]["close"] for sym in symbols)
-        total_vol = sum(by_epoch[sym][epoch].get("volume") or 0 for sym in symbols)
-        legs = {sym: by_epoch[sym][epoch]["close"] for sym in symbols}
-        merged.append({"epoch": epoch, "price": total_price, "volume": total_vol, "legs": legs})
-
+    merged = merge_basket_series(leg_candles_by_symbol)
     if not merged:
-        return {**base_info, "error": "no_overlapping_bars", "series": [], "entries": [], "day_pnl": 0.0}
+        return {
+            **base_info,
+            "error": "no_overlapping_bars_across_all_6_legs",
+            "series": [],
+            "entries": [],
+            "day_pnl": 0.0,
+        }
 
-    # --- 3. Compute VWAP & ATR ---
+    # --- 3. Combined VWAP from market open -----------------------------------
     vwap_values = compute_cumulative_vwap(merged)
-    atr_values = compute_basket_atr(merged, period=14)
-    
-    for bar, vwap, atr in zip(merged, vwap_values, atr_values):
+    for bar, vwap in zip(merged, vwap_values):
         bar["vwap"] = vwap
-        bar["atr"] = atr
 
     signal_epoch = ist_to_epoch(ist_datetime(trade_date_str, config.SIGNAL_START_TIME))
     squareoff_epoch = ist_to_epoch(ist_datetime(trade_date_str, config.SQUARE_OFF_TIME))
 
-    # --- 4. Main Simulation Loop ---
+    # --- 4. Walk the series: detect fresh downward crossings -> sell basket -
     entries = []
-    active_baskets = []  # dicts tracking position state
     was_below_vwap = False
     baskets_deployed = 0
-    first_signal_bar_processed = False
 
     for bar in merged:
-        current_epoch = bar["epoch"]
-        price = bar["price"]
-        vwap = bar["vwap"]
-        atr = bar["atr"]
-
-        if current_epoch < signal_epoch:
-            was_below_vwap = price < vwap
+        if bar["epoch"] < signal_epoch:
+            was_below_vwap = bar["price"] < bar["vwap"]
             continue
-
-        # 15:15 Time Exit
-        if current_epoch >= squareoff_epoch:
-            if active_baskets:
-                for b in active_baskets:
-                    e = entries[b["idx"]]
-                    e["exit_price"] = price
-                    e["exit_time"] = epoch_to_ist_time_str(current_epoch)
-                    e["exit_reason"] = "15:15 Time Exit"
-                    e["pnl"] = (e["entry_price"] - price) * qty_per_leg
-                active_baskets = []
+        if bar["epoch"] >= squareoff_epoch:
             break
 
-        is_below = price < vwap
-        is_above = price > vwap
+        is_below = bar["price"] < bar["vwap"]
+        fresh_cross_down = is_below and not was_below_vwap
 
-        # --- Update Active Trailing Stops & Check Trailing Exit ---
-        remaining_active = []
-        for b in active_baskets:
-            idx = b["idx"]
-            
-            # Record lowest price reached (High-Water Mark for Short trade)
-            if price < b["min_price"]:
-                b["min_price"] = price
-                # Update trailing stop line: min_price + (2.0 * ATR)
-                b["trailing_stop"] = b["min_price"] + (atr_multiplier * atr)
+        at_cap = (config.MAX_BASKETS_PER_DAY is not None
+                  and baskets_deployed >= config.MAX_BASKETS_PER_DAY)
 
-            # CHECK EXITS
-            # Exit 1: VWAP Cross Exit
-            if is_above:
-                e = entries[idx]
-                e["exit_price"] = price
-                e["exit_time"] = epoch_to_ist_time_str(current_epoch)
-                e["exit_reason"] = "Price > VWAP Exit"
-                e["pnl"] = (e["entry_price"] - price) * qty_per_leg
-
-            # Exit 2: Trailing Stop Hit (Price bounced up above trailing stop)
-            elif price >= b["trailing_stop"]:
-                e = entries[idx]
-                e["exit_price"] = price
-                e["exit_time"] = epoch_to_ist_time_str(current_epoch)
-                e["exit_reason"] = f"Trailing Stop Hit ({atr_multiplier}x ATR)"
-                e["pnl"] = (e["entry_price"] - price) * qty_per_leg
-
-            else:
-                remaining_active.append(b)
-
-        active_baskets = remaining_active
-
-        # --- Entry Logic ---
-        at_cap = (config.MAX_BASKETS_PER_DAY is not None and baskets_deployed >= config.MAX_BASKETS_PER_DAY)
-        should_entry = False
-
-        if not first_signal_bar_processed:
-            first_signal_bar_processed = True
-            if is_below and not at_cap:
-                should_entry = True
-        elif is_below and not was_below_vwap and not at_cap:
-            should_entry = True
-
-        if should_entry:
+        if fresh_cross_down and not at_cap:
             baskets_deployed += 1
-            e_dict = {
+            entries.append({
                 "basket_num": baskets_deployed,
-                "entry_epoch": current_epoch,
-                "entry_time": epoch_to_ist_time_str(current_epoch),
-                "entry_price": price,
-                "exit_price": None,
-                "exit_time": None,
-                "exit_reason": None,
-                "pnl": 0.0,
-            }
-            entries.append(e_dict)
-            
-            # Track min_price and trailing stop level
-            active_baskets.append({
-                "idx": len(entries) - 1,
-                "min_price": price,
-                "trailing_stop": price + (atr_multiplier * atr)
+                "entry_epoch": bar["epoch"],
+                "entry_time": epoch_to_ist_time_str(bar["epoch"]),
+                "entry_price": bar["price"],
             })
 
         was_below_vwap = is_below
 
-    day_pnl = sum(e["pnl"] for e in entries)
+    # --- 5. Square off all open baskets at 15:15 -----------------------------
+    squareoff_bar = _find_spot_at(merged, squareoff_epoch)
+    exit_price = squareoff_bar["price"] if squareoff_bar else None
+    exit_time = epoch_to_ist_time_str(squareoff_bar["epoch"]) if squareoff_bar else config.SQUARE_OFF_TIME
+
+    day_pnl = 0.0
+    for e in entries:
+        if exit_price is None:
+            e["exit_price"] = None
+            e["pnl"] = 0.0
+            continue
+        # SHORT basket (3 straddles, 6 legs): profit = (entry - exit) * qty_per_leg
+        # (combined price already sums all 6 legs at 1 lot each, so a single
+        # multiply by qty_per_leg gives total basket PnL)
+        pnl = (e["entry_price"] - exit_price) * qty_per_leg
+        e["exit_price"] = exit_price
+        e["exit_time"] = exit_time
+        e["pnl"] = pnl
+        day_pnl += pnl
 
     return {
         **base_info,
