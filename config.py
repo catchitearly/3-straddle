@@ -29,7 +29,7 @@ LOTS_PER_LEG_PER_BASKET = 1                 # 1 lot on each of the 6 legs per ba
 # Every fresh downward cross of combined-price below combined-VWAP (after
 # 09:45) sells one full basket again - exposure compounds. Set an int here to
 # cap the number of baskets sold per day; leave as None for unlimited.
-MAX_BASKETS_PER_DAY = None
+MAX_BASKETS_PER_DAY = 3 #None
 
 # ---------------------------------------------------------------------------
 # Timing (all times are IST / Asia-Kolkata, NOT server local time)
