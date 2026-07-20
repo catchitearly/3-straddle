@@ -1,22 +1,19 @@
 """
 Core backtest engine - 3-straddle BASKET strategy.
 
-Strategy recap
+Strategy Rules:
 --------------
-1. At 09:45 IST, sample Nifty spot, round to nearest 100 (both directions) to
-   fix the ATM strike for the day. Two more strikes are derived from it:
-   ATM-100 and ATM+100 (config.STRIKE_OFFSETS). Three straddles = 6 option legs.
-2. Build the COMBINED price series = sum of all 6 legs' 1-min close prices,
-   and its combined volume = sum of all 6 legs' volumes. Compute the
-   cumulative VWAP of this combined series starting from market open (09:15).
-3. From 09:45 onward, every time the combined price makes a FRESH downward
-   crossing of its own VWAP (was >= VWAP, now < VWAP), SELL one full basket:
-   1 lot each of ATM-100 straddle, ATM straddle, ATM+100 straddle (6 legs,
-   1 lot each). This can fire multiple times per day - exposure compounds
-   with each fresh cross (config.MAX_BASKETS_PER_DAY caps it if set).
-4. All open baskets are squared off together at 15:15 IST (pure time exit).
-
-No numpy / pandas - pure python throughout.
+1. At 09:45 IST, sample Nifty spot, round to nearest 100 to fix ATM strike.
+   Strikes used: ATM-100, ATM, ATM+100 (3 straddles = 6 legs).
+2. Build COMBINED price series = sum of 6 legs' close prices and cumulative VWAP.
+3. Entry Criteria:
+   - At 09:45 IST (exact signal bar), if price < VWAP -> SELL basket.
+   - If no entry at 09:45 or after an exit, check for FRESH downward crossing of VWAP
+     (was >= VWAP on previous bar, now < VWAP).
+   - Can entry multiple times if capped by config.MAX_BASKETS_PER_DAY.
+4. Exit Criteria:
+   - Dynamic Exit: Whenever price crosses ABOVE VWAP (price > VWAP), exit ALL open positions.
+   - Time Exit: Force exit all open positions at 15:15 IST.
 """
 
 from src.ist_time import ist_datetime, ist_to_epoch, epoch_to_ist_time_str
@@ -43,7 +40,7 @@ def merge_basket_series(leg_candles_by_symbol):
     Merge on epochs common to ALL 6 legs into a combined basket series:
         [{"epoch", "price" (sum of 6 closes), "volume" (sum of 6 volumes),
           "legs": {symbol: close, ...}}, ...]
-    Timestamps missing from any single leg are dropped (illiquid/missing minute).
+    Timestamps missing from any single leg are dropped.
     """
     symbols = list(leg_candles_by_symbol.keys())
     by_epoch = {sym: {c["epoch"]: c for c in candles}
@@ -73,9 +70,7 @@ def merge_basket_series(leg_candles_by_symbol):
 
 def run_day_backtest(trade_date_str, fyers_client):
     """
-    Run the basket strategy for a single trading day.
-    Returns a dict describing the day's result, or None if the day should be
-    skipped entirely (no underlying data at all - holiday/no session).
+    Run the basket strategy for a single trading day with modified VWAP exit and entry logic.
     """
     lot_size = config.get_lot_size(trade_date_str)
     qty_per_leg = config.LOTS_PER_LEG_PER_BASKET * lot_size
@@ -146,54 +141,92 @@ def run_day_backtest(trade_date_str, fyers_client):
     signal_epoch = ist_to_epoch(ist_datetime(trade_date_str, config.SIGNAL_START_TIME))
     squareoff_epoch = ist_to_epoch(ist_datetime(trade_date_str, config.SQUARE_OFF_TIME))
 
-    # --- 4. Walk the series: detect fresh downward crossings -> sell basket -
+    # --- 4. Main Simulation Walk ---------------------------------------------
     entries = []
+    active_baskets = []  # Track indices of open entries in `entries`
     was_below_vwap = False
     baskets_deployed = 0
+    first_signal_bar_processed = False
 
     for bar in merged:
-        if bar["epoch"] < signal_epoch:
-            was_below_vwap = bar["price"] < bar["vwap"]
+        current_epoch = bar["epoch"]
+        price = bar["price"]
+        vwap = bar["vwap"]
+
+        # Track VWAP position before 09:45 IST
+        if current_epoch < signal_epoch:
+            was_below_vwap = price < vwap
             continue
-        if bar["epoch"] >= squareoff_epoch:
+
+        # Force time exit at 15:15 IST
+        if current_epoch >= squareoff_epoch:
+            if active_baskets:
+                for idx in active_baskets:
+                    pnl = (entries[idx]["entry_price"] - price) * qty_per_leg
+                    entries[idx]["exit_price"] = price
+                    entries[idx]["exit_time"] = epoch_to_ist_time_str(current_epoch)
+                    entries[idx]["exit_reason"] = "15:15 Time Exit"
+                    entries[idx]["pnl"] = pnl
+                active_baskets = []
             break
 
-        is_below = bar["price"] < bar["vwap"]
-        fresh_cross_down = is_below and not was_below_vwap
+        is_below = price < vwap
+        is_above = price > vwap
 
+        # --- A. Dynamic Exit: Exit when price > VWAP ---
+        if is_above and active_baskets:
+            for idx in active_baskets:
+                pnl = (entries[idx]["entry_price"] - price) * qty_per_leg
+                entries[idx]["exit_price"] = price
+                entries[idx]["exit_time"] = epoch_to_ist_time_str(current_epoch)
+                entries[idx]["exit_reason"] = "Price > VWAP Exit"
+                entries[idx]["pnl"] = pnl
+            active_baskets = []
+
+        # --- B. Entry Logic ---
         at_cap = (config.MAX_BASKETS_PER_DAY is not None
                   and baskets_deployed >= config.MAX_BASKETS_PER_DAY)
 
-        if fresh_cross_down and not at_cap:
+        should_entry = False
+
+        # 1. First candle at/after 09:45 IST
+        if not first_signal_bar_processed:
+            first_signal_bar_processed = True
+            if is_below and not at_cap:
+                should_entry = True
+
+        # 2. Subsequent fresh downward crossings (was >= VWAP, now < VWAP)
+        elif is_below and not was_below_vwap and not at_cap:
+            should_entry = True
+
+        if should_entry:
             baskets_deployed += 1
-            entries.append({
+            entry_data = {
                 "basket_num": baskets_deployed,
-                "entry_epoch": bar["epoch"],
-                "entry_time": epoch_to_ist_time_str(bar["epoch"]),
-                "entry_price": bar["price"],
-            })
+                "entry_epoch": current_epoch,
+                "entry_time": epoch_to_ist_time_str(current_epoch),
+                "entry_price": price,
+                "exit_price": None,
+                "exit_time": None,
+                "exit_reason": None,
+                "pnl": 0.0,
+            }
+            entries.append(entry_data)
+            active_baskets.append(len(entries) - 1)
 
         was_below_vwap = is_below
 
-    # --- 5. Square off all open baskets at 15:15 -----------------------------
-    squareoff_bar = _find_spot_at(merged, squareoff_epoch)
-    exit_price = squareoff_bar["price"] if squareoff_bar else None
-    exit_time = epoch_to_ist_time_str(squareoff_bar["epoch"]) if squareoff_bar else config.SQUARE_OFF_TIME
+    # --- 5. Clean up open positions if day ends unexpectedly before 15:15 ----
+    if active_baskets and merged:
+        last_bar = merged[-1]
+        for idx in active_baskets:
+            pnl = (entries[idx]["entry_price"] - last_bar["price"]) * qty_per_leg
+            entries[idx]["exit_price"] = last_bar["price"]
+            entries[idx]["exit_time"] = epoch_to_ist_time_str(last_bar["epoch"])
+            entries[idx]["exit_reason"] = "End of Day Market Close"
+            entries[idx]["pnl"] = pnl
 
-    day_pnl = 0.0
-    for e in entries:
-        if exit_price is None:
-            e["exit_price"] = None
-            e["pnl"] = 0.0
-            continue
-        # SHORT basket (3 straddles, 6 legs): profit = (entry - exit) * qty_per_leg
-        # (combined price already sums all 6 legs at 1 lot each, so a single
-        # multiply by qty_per_leg gives total basket PnL)
-        pnl = (e["entry_price"] - exit_price) * qty_per_leg
-        e["exit_price"] = exit_price
-        e["exit_time"] = exit_time
-        e["pnl"] = pnl
-        day_pnl += pnl
+    day_pnl = sum(e["pnl"] for e in entries)
 
     return {
         **base_info,
