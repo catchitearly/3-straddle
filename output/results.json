@@ -5273,16 +5273,27 @@
     "entries": [
       {
         "basket_num": 1,
+        "entry_epoch": 1784088900,
+        "entry_time": "09:45",
+        "entry_price": 979.4000000000001,
+        "exit_price": 998.7,
+        "exit_time": "12:55",
+        "exit_reason": "Price > VWAP Exit",
+        "pnl": -1254.499999999997
+      },
+      {
+        "basket_num": 2,
         "entry_epoch": 1784106540,
         "entry_time": "14:39",
         "entry_price": 980.3499999999999,
-        "exit_price": 1004.8,
-        "exit_time": "15:15",
-        "pnl": -1589.250000000003
+        "exit_price": 988.85,
+        "exit_time": "14:40",
+        "exit_reason": "Price > VWAP Exit",
+        "pnl": -552.5000000000074
       }
     ],
-    "day_pnl": -1589.250000000003,
-    "num_baskets_deployed": 1
+    "day_pnl": -1807.0000000000045,
+    "num_baskets_deployed": 2
   },
   {
     "date": "2026-07-16",
@@ -10558,25 +10569,37 @@
     "entries": [
       {
         "basket_num": 1,
-        "entry_epoch": 1784180520,
-        "entry_time": "11:12",
-        "entry_price": 846.3,
-        "exit_price": 792.0,
-        "exit_time": "15:15",
-        "pnl": 3529.4999999999973
+        "entry_epoch": 1784175300,
+        "entry_time": "09:45",
+        "entry_price": 840.8499999999999,
+        "exit_price": 845.8999999999999,
+        "exit_time": "10:55",
+        "exit_reason": "Price > VWAP Exit",
+        "pnl": -328.24999999999704
       },
       {
         "basket_num": 2,
+        "entry_epoch": 1784180520,
+        "entry_time": "11:12",
+        "entry_price": 846.3,
+        "exit_price": 841.0,
+        "exit_time": "13:40",
+        "exit_reason": "Price > VWAP Exit",
+        "pnl": 344.49999999999704
+      },
+      {
+        "basket_num": 3,
         "entry_epoch": 1784189880,
         "entry_time": "13:48",
         "entry_price": 828.5999999999999,
         "exit_price": 792.0,
         "exit_time": "15:15",
+        "exit_reason": "15:15 Time Exit",
         "pnl": 2378.999999999994
       }
     ],
-    "day_pnl": 5908.499999999991,
-    "num_baskets_deployed": 2
+    "day_pnl": 2395.249999999994,
+    "num_baskets_deployed": 3
   },
   {
     "date": "2026-07-17",
@@ -15855,247 +15878,34 @@
         "entry_epoch": 1784262360,
         "entry_time": "09:56",
         "entry_price": 798.5,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": -230.74999999999704
+        "exit_price": 797.9000000000001,
+        "exit_time": "10:11",
+        "exit_reason": "Price > VWAP Exit",
+        "pnl": 38.99999999999409
       },
       {
         "basket_num": 2,
         "entry_epoch": 1784265540,
         "entry_time": "10:49",
         "entry_price": 810.1,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 523.2500000000044
+        "exit_price": 811.75,
+        "exit_time": "10:53",
+        "exit_reason": "Price > VWAP Exit",
+        "pnl": -107.24999999999852
       },
       {
         "basket_num": 3,
         "entry_epoch": 1784265840,
         "entry_time": "10:54",
         "entry_price": 809.1500000000001,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 461.50000000000887
-      },
-      {
-        "basket_num": 4,
-        "entry_epoch": 1784266020,
-        "entry_time": "10:57",
-        "entry_price": 810.8,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 568.75
-      },
-      {
-        "basket_num": 5,
-        "entry_epoch": 1784266140,
-        "entry_time": "10:59",
-        "entry_price": 809.3,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 471.25
-      },
-      {
-        "basket_num": 6,
-        "entry_epoch": 1784266260,
-        "entry_time": "11:01",
-        "entry_price": 810.3500000000001,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 539.5000000000118
-      },
-      {
-        "basket_num": 7,
-        "entry_epoch": 1784266620,
-        "entry_time": "11:07",
-        "entry_price": 806.45,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 286.0000000000059
-      },
-      {
-        "basket_num": 8,
-        "entry_epoch": 1784268720,
-        "entry_time": "11:42",
-        "entry_price": 809.05,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 455.0
-      },
-      {
-        "basket_num": 9,
-        "entry_epoch": 1784269020,
-        "entry_time": "11:47",
-        "entry_price": 809.5,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 484.25000000000296
-      },
-      {
-        "basket_num": 10,
-        "entry_epoch": 1784269800,
-        "entry_time": "12:00",
-        "entry_price": 809.4,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 477.7500000000015
-      },
-      {
-        "basket_num": 11,
-        "entry_epoch": 1784270160,
-        "entry_time": "12:06",
-        "entry_price": 807.7,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 367.2500000000059
-      },
-      {
-        "basket_num": 12,
-        "entry_epoch": 1784270460,
-        "entry_time": "12:11",
-        "entry_price": 809.35,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 474.50000000000443
-      },
-      {
-        "basket_num": 13,
-        "entry_epoch": 1784270580,
-        "entry_time": "12:13",
-        "entry_price": 805.75,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 240.50000000000296
-      },
-      {
-        "basket_num": 14,
-        "entry_epoch": 1784270760,
-        "entry_time": "12:16",
-        "entry_price": 806.6999999999999,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 302.2499999999985
-      },
-      {
-        "basket_num": 15,
-        "entry_epoch": 1784270940,
-        "entry_time": "12:19",
-        "entry_price": 809.3500000000001,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 474.5000000000118
-      },
-      {
-        "basket_num": 16,
-        "entry_epoch": 1784271060,
-        "entry_time": "12:21",
-        "entry_price": 809.9,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 510.2500000000015
-      },
-      {
-        "basket_num": 17,
-        "entry_epoch": 1784272200,
-        "entry_time": "12:40",
-        "entry_price": 807.1499999999999,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 331.4999999999941
-      },
-      {
-        "basket_num": 18,
-        "entry_epoch": 1784272980,
-        "entry_time": "12:53",
-        "entry_price": 807.9999999999999,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 386.74999999999557
-      },
-      {
-        "basket_num": 19,
-        "entry_epoch": 1784273280,
-        "entry_time": "12:58",
-        "entry_price": 807.95,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 383.5000000000059
-      },
-      {
-        "basket_num": 20,
-        "entry_epoch": 1784273520,
-        "entry_time": "13:02",
-        "entry_price": 806.3,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 276.25
-      },
-      {
-        "basket_num": 21,
-        "entry_epoch": 1784278740,
-        "entry_time": "14:29",
-        "entry_price": 800.55,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": -97.5
-      },
-      {
-        "basket_num": 22,
-        "entry_epoch": 1784278860,
-        "entry_time": "14:31",
-        "entry_price": 806.45,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 286.0000000000059
-      },
-      {
-        "basket_num": 23,
-        "entry_epoch": 1784279100,
-        "entry_time": "14:35",
-        "entry_price": 808.6500000000001,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 429.00000000000887
-      },
-      {
-        "basket_num": 24,
-        "entry_epoch": 1784280180,
-        "entry_time": "14:53",
-        "entry_price": 809.65,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 494.0000000000015
-      },
-      {
-        "basket_num": 25,
-        "entry_epoch": 1784280540,
-        "entry_time": "14:59",
-        "entry_price": 805.45,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 221.0000000000059
-      },
-      {
-        "basket_num": 26,
-        "entry_epoch": 1784280780,
-        "entry_time": "15:03",
-        "entry_price": 807.6499999999999,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 363.9999999999941
-      },
-      {
-        "basket_num": 27,
-        "entry_epoch": 1784281440,
-        "entry_time": "15:14",
-        "entry_price": 807.1500000000001,
-        "exit_price": 802.05,
-        "exit_time": "15:15",
-        "pnl": 331.50000000000887
+        "exit_price": 813.25,
+        "exit_time": "10:56",
+        "exit_reason": "Price > VWAP Exit",
+        "pnl": -266.4999999999941
       }
     ],
-    "day_pnl": 9811.750000000085,
-    "num_baskets_deployed": 27
+    "day_pnl": -334.7499999999985,
+    "num_baskets_deployed": 3
   },
   {
     "date": "2026-07-20",
@@ -20979,15 +20789,26 @@
     "entries": [
       {
         "basket_num": 1,
+        "entry_epoch": 1784520900,
+        "entry_time": "09:45",
+        "entry_price": 591.8499999999999,
+        "exit_price": 569.8,
+        "exit_time": "12:47",
+        "exit_reason": "Price > VWAP Exit",
+        "pnl": 1433.249999999997
+      },
+      {
+        "basket_num": 2,
         "entry_epoch": 1784531880,
         "entry_time": "12:48",
         "entry_price": 565.4,
         "exit_price": 492.1,
         "exit_time": "15:01",
+        "exit_reason": "End of Day Market Close",
         "pnl": 4764.499999999997
       }
     ],
-    "day_pnl": 4764.499999999997,
-    "num_baskets_deployed": 1
+    "day_pnl": 6197.7499999999945,
+    "num_baskets_deployed": 2
   }
 ]
