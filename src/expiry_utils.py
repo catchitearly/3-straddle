@@ -1,13 +1,5 @@
 """
-Weekly expiry calculation + Fyers option symbol construction.
-
-Fyers weekly option symbol convention (established in prior projects):
-    NSE:NIFTY{EXPIRY_STR}{STRIKE}{CE|PE}
-    EXPIRY_STR = YY + M(no leading zero) + DD   e.g. 2025-09-16 -> "25916"
-
-Weekly expiry weekday changed from Thursday to Tuesday starting the week of
-2025-09-01 (see config.WEEKLY_EXPIRY_SWITCH_DATE) - verify against the NSE
-circular for your exact backtest window.
+Weekly/Monthly expiry calculation + Fyers option symbol construction.
 """
 
 from datetime import datetime, timedelta
@@ -48,10 +40,20 @@ def get_weekly_expiry(trade_date_str):
     return _shift_back_for_holidays(expiry_str)
 
 
-def expiry_code(expiry_date_str):
-    """Format 'YYYY-MM-DD' as Fyers weekly expiry code: YY + M(no leading zero) + DD."""
+def expiry_code(expiry_date_str, format_type="MONTHLY"):
+    """
+    Format 'YYYY-MM-DD' into Fyers expiry string.
+    - format_type="MONTHLY": YY + MMM in uppercase (e.g., 2026-07-30 -> '26JUL')
+    - format_type="WEEKLY":  YY + M(no leading zero) + DD (e.g., 2026-07-30 -> '26730')
+    """
     y, m, d = (int(x) for x in expiry_date_str.split("-"))
     yy = y % 100
+
+    if format_type == "MONTHLY":
+        dt = datetime(y, m, d)
+        month_str = dt.strftime("%b").upper()  # 'JUL', 'AUG', etc.
+        return f"{yy}{month_str}"
+
     return f"{yy}{m}{d:02d}"
 
 
@@ -61,12 +63,15 @@ def round_to_nearest_strike(spot_price, step=None):
     return int(round(spot_price / step) * step)
 
 
-def build_option_symbol(trade_date_str, strike, opt_type):
+def build_option_symbol(trade_date_str, strike, opt_type, override_code="26JUL"):
     """
-    Build the Fyers option symbol, e.g. NSE:NIFTY25916 24800CE
-    opt_type must be 'CE' or 'PE'.
+    Build the Fyers option symbol.
+    If `override_code` is passed, it uses it directly (e.g., NSE:NIFTY26JUL24500CE).
     """
     assert opt_type in ("CE", "PE")
     expiry_date_str = get_weekly_expiry(trade_date_str)
-    code = expiry_code(expiry_date_str)
+    
+    # Use hardcoded/custom code if provided, otherwise compute from date
+    code = override_code if override_code else expiry_code(expiry_date_str, format_type="MONTHLY")
+    
     return f"NSE:NIFTY{code}{strike}{opt_type}", expiry_date_str
