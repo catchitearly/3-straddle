@@ -20,9 +20,16 @@ LOT_SIZE_BY_DATE = [
 
 STRIKE_ROUND_TO = 100                       # round spot to nearest 100 (both ways)
 
-MAX_STRADDLES_PER_DAY = 3                   # hard cap on total straddles deployed/day
-LOTS_PER_STRADDLE_ENTRY = 1                 # each VWAP-cross entry = this many lots
-                                             # per leg (1 lot CE + 1 lot PE = 1 straddle)
+# The basket = 3 straddles sold TOGETHER: ATM-100, ATM, ATM+100 (6 option legs
+# total). "Combined price"/"combined VWAP" refers to the sum across all 6 legs.
+STRIKE_OFFSETS = [-100, 0, 100]
+
+LOTS_PER_LEG_PER_BASKET = 1                 # 1 lot on each of the 6 legs per basket
+
+# Every fresh downward cross of combined-price below combined-VWAP (after
+# 09:45) sells one full basket again - exposure compounds. Set an int here to
+# cap the number of baskets sold per day; leave as None for unlimited.
+MAX_BASKETS_PER_DAY = None
 
 # ---------------------------------------------------------------------------
 # Timing (all times are IST / Asia-Kolkata, NOT server local time)
@@ -41,7 +48,7 @@ CANDLE_RESOLUTION = "1"                     # 1-minute candles
 # Weekly Nifty expiry was Thursday until Sept 2025, shifted to Tuesday after.
 # This date is the cutover - the LAST Thursday-expiry week before the switch.
 # Verify against the official NSE circular before relying on this for real trades.
-WEEKLY_EXPIRY_SWITCH_DATE = "202-07-21"    # from this date onward -> Tuesday expiry
+WEEKLY_EXPIRY_SWITCH_DATE = "2025-09-01"    # from this date onward -> Tuesday expiry
 EXPIRY_WEEKDAY_BEFORE_SWITCH = 3             # Thursday (Mon=0 ... Sun=6)
 EXPIRY_WEEKDAY_AFTER_SWITCH = 1              # Tuesday
 

@@ -41,11 +41,11 @@ def main(start_date=None, end_date=None):
             continue
 
         if result.get("error"):
-            print(f"  {date_str}: {result['error']} (strike {result.get('strike')})")
+            print(f"  {date_str}: {result['error']} (strikes {result.get('strikes')})")
         else:
             print(
-                f"  {date_str}: strike={result['strike']} "
-                f"straddles={result['num_straddles_deployed']} "
+                f"  {date_str}: strikes={result['strikes']} "
+                f"baskets={result['num_baskets_deployed']} "
                 f"day_pnl={result['day_pnl']:.2f}"
             )
 
@@ -59,9 +59,9 @@ def main(start_date=None, end_date=None):
     print(f"\nWrote {config.RESULTS_JSON} and {config.OUTPUT_HTML}")
 
     total_pnl = sum(r.get("day_pnl", 0.0) for r in day_results)
-    total_straddles = sum(r.get("num_straddles_deployed", 0) for r in day_results)
+    total_baskets = sum(r.get("num_baskets_deployed", 0) for r in day_results)
     print(f"Total PnL across {len(day_results)} days: {total_pnl:.2f} "
-          f"({total_straddles} straddles deployed)")
+          f"({total_baskets} baskets deployed)")
 
 
 if __name__ == "__main__":

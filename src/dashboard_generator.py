@@ -23,7 +23,8 @@ def _day_payload(result):
         return {
             "date": date_str,
             "error": result.get("error", "no_data"),
-            "strike": result.get("strike"),
+            "atm_strike": result.get("atm_strike"),
+            "strikes": result.get("strikes"),
             "expiry": result.get("expiry"),
             "times": [],
             "price": [],
@@ -40,7 +41,7 @@ def _day_payload(result):
     entries = []
     for e in result.get("entries", []):
         entries.append({
-            "straddle_num": e["straddle_num"],
+            "basket_num": e["basket_num"],
             "entry_time": e["entry_time"],
             "entry_price": round(e["entry_price"], 2),
             "exit_time": e.get("exit_time"),
@@ -50,16 +51,16 @@ def _day_payload(result):
 
     return {
         "date": date_str,
-        "strike": result.get("strike"),
+        "atm_strike": result.get("atm_strike"),
+        "strikes": result.get("strikes"),
         "expiry": result.get("expiry"),
-        "ce_symbol": result.get("ce_symbol"),
-        "pe_symbol": result.get("pe_symbol"),
+        "leg_symbols": result.get("leg_symbols"),
         "times": times,
         "price": price,
         "vwap": vwap,
         "entries": entries,
         "day_pnl": round(result.get("day_pnl", 0.0), 2),
-        "num_straddles_deployed": result.get("num_straddles_deployed", 0),
+        "num_baskets_deployed": result.get("num_baskets_deployed", 0),
     }
 
 
@@ -70,7 +71,7 @@ def generate_dashboard(day_results, output_path):
     win_days = sum(1 for p in payloads if p["day_pnl"] > 0)
     loss_days = sum(1 for p in payloads if p["day_pnl"] < 0)
     flat_days = sum(1 for p in payloads if p["day_pnl"] == 0)
-    total_straddles = sum(p.get("num_straddles_deployed", 0) for p in payloads)
+    total_baskets = sum(p.get("num_baskets_deployed", 0) for p in payloads)
 
     cum = 0.0
     equity_dates = []
@@ -86,7 +87,7 @@ def generate_dashboard(day_results, output_path):
         "loss_days": loss_days,
         "flat_days": flat_days,
         "total_pnl": round(total_pnl, 2),
-        "total_straddles": total_straddles,
+        "total_baskets": total_baskets,
         "equity_dates": equity_dates,
         "equity_curve": equity_curve,
     }
@@ -184,8 +185,8 @@ def _build_html(payloads, summary):
 </head>
 <body>
 
-<h1>Nifty Straddle &middot; VWAP Mean-Reversion Backtest</h1>
-<div class="subtitle">ATM straddle fixed at 09:45 &middot; sell on downward VWAP cross &middot; square-off 15:15 &middot; max 3 straddles/day</div>
+<h1>Nifty 3-Straddle Basket &middot; VWAP Mean-Reversion Backtest</h1>
+<div class="subtitle">ATM-100 / ATM / ATM+100 straddles fixed at 09:45 &middot; sell basket on downward VWAP cross (repeats on every fresh cross) &middot; square-off 15:15</div>
 
 <div class="summary">
   <div class="stat"><div class="label">Total PnL</div>
@@ -193,7 +194,7 @@ def _build_html(payloads, summary):
   <div class="stat"><div class="label">Days</div><div class="value">{summary['total_days']}</div></div>
   <div class="stat"><div class="label">Win Days</div><div class="value pos">{summary['win_days']}</div></div>
   <div class="stat"><div class="label">Loss Days</div><div class="value neg">{summary['loss_days']}</div></div>
-  <div class="stat"><div class="label">Straddles Sold</div><div class="value">{summary['total_straddles']}</div></div>
+  <div class="stat"><div class="label">Baskets Sold</div><div class="value">{summary['total_baskets']}</div></div>
 </div>
 
 <div id="equity-curve"></div>
@@ -233,14 +234,14 @@ function buildDayPanel(idx) {{
 
   if (d.error || d.times.length === 0) {{
     panel.innerHTML = `<div class="no-data">No usable data for ${{d.date}}` +
-      (d.strike ? ` (strike ${{d.strike}})` : '') +
+      (d.strikes ? ` (strikes ${{d.strikes.join(', ')}})` : '') +
       `: ${{d.error || 'no data'}}</div>`;
     return panel;
   }}
 
   const entryRows = d.entries.map(e => `
     <tr>
-      <td>#${{e.straddle_num}}</td>
+      <td>#${{e.basket_num}}</td>
       <td>${{e.entry_time}}</td>
       <td>${{e.entry_price}}</td>
       <td>${{e.exit_time || '-'}}</td>
@@ -250,9 +251,9 @@ function buildDayPanel(idx) {{
 
   panel.innerHTML = `
     <div class="day-meta">
-      <div>Strike: <b>${{d.strike}}</b></div>
+      <div>Strikes: <b>${{d.strikes.join(' / ')}}</b> (ATM ${{d.atm_strike}})</div>
       <div>Expiry: <b>${{d.expiry || '-'}}</b></div>
-      <div>Straddles sold: <b>${{d.num_straddles_deployed || 0}}</b></div>
+      <div>Baskets sold: <b>${{d.num_baskets_deployed || 0}}</b></div>
       <div>Day PnL: <b class="${{d.day_pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}}">${{d.day_pnl >= 0 ? '+' : ''}}${{d.day_pnl}}</b></div>
     </div>
     <div class="chart-box"><div id="price-chart-${{idx}}" style="height:340px;"></div></div>
@@ -280,14 +281,14 @@ function renderCharts(idx) {{
   }};
   const entryTrace = {{
     x: d.entries.map(e => e.entry_time), y: d.entries.map(e => e.entry_price),
-    type: 'scatter', mode: 'markers+text', name: 'Sell Entry',
-    text: d.entries.map(e => '#' + e.straddle_num),
+    type: 'scatter', mode: 'markers+text', name: 'Sell Basket',
+    text: d.entries.map(e => '#' + e.basket_num),
     textposition: 'top center', textfont: {{color: '#ff5c5c', size: 10}},
     marker: {{color: '#ff5c5c', size: 9, symbol: 'triangle-down'}}
   }};
 
   const priceLayout = {{
-    title: {{text: 'Combined Straddle Price vs VWAP', font: {{color: '#e6e8ec', size: 13}}}},
+    title: {{text: 'Combined 3-Straddle Basket Price vs VWAP', font: {{color: '#e6e8ec', size: 13}}}},
     paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
     font: {{color: '#8a90a0', size: 11}},
     margin: {{l: 50, r: 20, t: 30, b: 30}},
@@ -298,12 +299,12 @@ function renderCharts(idx) {{
     {{displayModeBar: false, responsive: true}});
 
   const pnlTrace = {{
-    x: d.entries.map(e => '#' + e.straddle_num + ' (' + e.entry_time + ')'),
-    y: d.entries.map(e => e.pnl), type: 'bar', name: 'PnL per straddle',
+    x: d.entries.map(e => '#' + e.basket_num + ' (' + e.entry_time + ')'),
+    y: d.entries.map(e => e.pnl), type: 'bar', name: 'PnL per basket',
     marker: {{color: d.entries.map(e => e.pnl >= 0 ? '#2ecc71' : '#ff5c5c')}}
   }};
   const pnlLayout = {{
-    title: {{text: 'PnL per Straddle', font: {{color: '#e6e8ec', size: 13}}}},
+    title: {{text: 'PnL per Basket', font: {{color: '#e6e8ec', size: 13}}}},
     paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
     font: {{color: '#8a90a0', size: 11}},
     margin: {{l: 50, r: 20, t: 30, b: 30}},

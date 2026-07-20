@@ -1,17 +1,20 @@
 """
-Core backtest engine for the Nifty Straddle-VWAP mean-reversion strategy.
+Core backtest engine - 3-straddle BASKET strategy.
 
 Strategy recap
 --------------
-1. At 09:45 IST, sample the Nifty spot price and round to the nearest 100
-   (both directions) to fix the ATM strike for the day.
-2. Build the combined straddle (ATM CE + ATM PE) 1-min price series for the
-   whole day, and its cumulative VWAP starting from market open (09:15).
-3. From 09:45 onward, every time the combined straddle price makes a fresh
-   downward crossing of its own VWAP (was >= VWAP, now < VWAP), SELL one
-   straddle (1 lot CE + 1 lot PE) - up to a cap of MAX_STRADDLES_PER_DAY.
-4. All open straddles are squared off together at 15:15 IST (no intraday
-   profit target / stop - purely a time exit).
+1. At 09:45 IST, sample Nifty spot, round to nearest 100 (both directions) to
+   fix the ATM strike for the day. Two more strikes are derived from it:
+   ATM-100 and ATM+100 (config.STRIKE_OFFSETS). Three straddles = 6 option legs.
+2. Build the COMBINED price series = sum of all 6 legs' 1-min close prices,
+   and its combined volume = sum of all 6 legs' volumes. Compute the
+   cumulative VWAP of this combined series starting from market open (09:15).
+3. From 09:45 onward, every time the combined price makes a FRESH downward
+   crossing of its own VWAP (was >= VWAP, now < VWAP), SELL one full basket:
+   1 lot each of ATM-100 straddle, ATM straddle, ATM+100 straddle (6 legs,
+   1 lot each). This can fire multiple times per day - exposure compounds
+   with each fresh cross (config.MAX_BASKETS_PER_DAY caps it if set).
+4. All open baskets are squared off together at 15:15 IST (pure time exit).
 
 No numpy / pandas - pure python throughout.
 """
@@ -20,17 +23,6 @@ from src.ist_time import ist_datetime, ist_to_epoch, epoch_to_ist_time_str
 from src.vwap import compute_cumulative_vwap
 from src.expiry_utils import round_to_nearest_strike, build_option_symbol
 import config
-
-
-def _bars_from(candles, start_epoch=None):
-    """Convert raw candle dicts into (epoch, price, volume) bars, optionally
-    filtered to epoch >= start_epoch."""
-    out = []
-    for c in candles:
-        if start_epoch is not None and c["epoch"] < start_epoch:
-            continue
-        out.append(c)
-    return out
 
 
 def _find_spot_at(candles, target_epoch):
@@ -43,41 +35,52 @@ def _find_spot_at(candles, target_epoch):
     return after[0] if after else None
 
 
-def merge_straddle_series(ce_candles, pe_candles):
+def merge_basket_series(leg_candles_by_symbol):
     """
-    Merge CE and PE 1-min candles on matching epoch timestamps into a combined
-    straddle series: [{"epoch", "price" (CE.close+PE.close), "volume" (CE.vol+PE.vol),
-    "ce_close", "pe_close"}], sorted ascending. Timestamps present in only one
-    leg are dropped (rare, usually a missing/illiquid minute).
+    leg_candles_by_symbol: dict of symbol -> list of candle dicts (6 entries:
+    3 strikes x CE/PE).
+
+    Merge on epochs common to ALL 6 legs into a combined basket series:
+        [{"epoch", "price" (sum of 6 closes), "volume" (sum of 6 volumes),
+          "legs": {symbol: close, ...}}, ...]
+    Timestamps missing from any single leg are dropped (illiquid/missing minute).
     """
-    pe_by_epoch = {c["epoch"]: c for c in pe_candles}
+    symbols = list(leg_candles_by_symbol.keys())
+    by_epoch = {sym: {c["epoch"]: c for c in candles}
+                for sym, candles in leg_candles_by_symbol.items()}
+
+    if not symbols:
+        return []
+
+    common_epochs = set(by_epoch[symbols[0]].keys())
+    for sym in symbols[1:]:
+        common_epochs &= set(by_epoch[sym].keys())
+
     merged = []
-    for ce in ce_candles:
-        pe = pe_by_epoch.get(ce["epoch"])
-        if pe is None:
-            continue
-        merged.append({
-            "epoch": ce["epoch"],
-            "price": ce["close"] + pe["close"],
-            "volume": (ce.get("volume") or 0) + (pe.get("volume") or 0),
-            "ce_close": ce["close"],
-            "pe_close": pe["close"],
-        })
-    merged.sort(key=lambda b: b["epoch"])
+    for epoch in sorted(common_epochs):
+        total_price = 0.0
+        total_vol = 0
+        legs = {}
+        for sym in symbols:
+            c = by_epoch[sym][epoch]
+            total_price += c["close"]
+            total_vol += c.get("volume") or 0
+            legs[sym] = c["close"]
+        merged.append({"epoch": epoch, "price": total_price, "volume": total_vol, "legs": legs})
+
     return merged
 
 
 def run_day_backtest(trade_date_str, fyers_client):
     """
-    Run the strategy for a single trading day.
-
+    Run the basket strategy for a single trading day.
     Returns a dict describing the day's result, or None if the day should be
-    skipped (e.g. no data - holiday, or option history unavailable).
+    skipped entirely (no underlying data at all - holiday/no session).
     """
     lot_size = config.get_lot_size(trade_date_str)
-    qty_per_leg_per_straddle = config.LOTS_PER_STRADDLE_ENTRY * lot_size
+    qty_per_leg = config.LOTS_PER_LEG_PER_BASKET * lot_size
 
-    # --- 1. Spot at 09:45, fix ATM strike -----------------------------------
+    # --- 1. Spot at 09:45, fix ATM + the two wing strikes -------------------
     spot_candles = fyers_client.get_day_candles(config.UNDERLYING_SYMBOL, trade_date_str)
     if not spot_candles:
         return None
@@ -87,41 +90,55 @@ def run_day_backtest(trade_date_str, fyers_client):
     if spot_bar is None:
         return None
 
-    strike = round_to_nearest_strike(spot_bar["close"])
-    ce_symbol, expiry_date = build_option_symbol(trade_date_str, strike, "CE")
-    pe_symbol, _ = build_option_symbol(trade_date_str, strike, "PE")
+    atm_strike = round_to_nearest_strike(spot_bar["close"])
+    strikes = sorted(atm_strike + off for off in config.STRIKE_OFFSETS)
 
-    # --- 2. Fetch CE/PE 1-min candles for the whole day ---------------------
-    ce_candles = fyers_client.get_day_candles(ce_symbol, trade_date_str)
-    pe_candles = fyers_client.get_day_candles(pe_symbol, trade_date_str)
-    if not ce_candles or not pe_candles:
+    # --- 2. Build all 6 option symbols, fetch candles ------------------------
+    leg_symbols = {}       # symbol -> (strike, opt_type)
+    expiry_date = None
+    for strike in strikes:
+        for opt_type in ("CE", "PE"):
+            sym, expiry_date = build_option_symbol(trade_date_str, strike, opt_type)
+            leg_symbols[sym] = (strike, opt_type)
+
+    leg_candles_by_symbol = {}
+    missing = []
+    for sym in leg_symbols:
+        candles = fyers_client.get_day_candles(sym, trade_date_str)
+        if not candles:
+            missing.append(sym)
+        leg_candles_by_symbol[sym] = candles
+
+    base_info = {
+        "date": trade_date_str,
+        "atm_strike": atm_strike,
+        "strikes": strikes,
+        "expiry": expiry_date,
+        "leg_symbols": list(leg_symbols.keys()),
+        "lot_size": lot_size,
+        "qty_per_leg": qty_per_leg,
+    }
+
+    if missing:
         return {
-            "date": trade_date_str,
-            "strike": strike,
-            "expiry": expiry_date,
-            "ce_symbol": ce_symbol,
-            "pe_symbol": pe_symbol,
-            "error": "missing_option_data",
+            **base_info,
+            "error": f"missing_option_data: {', '.join(missing)}",
             "series": [],
             "entries": [],
             "day_pnl": 0.0,
         }
 
-    merged = merge_straddle_series(ce_candles, pe_candles)
+    merged = merge_basket_series(leg_candles_by_symbol)
     if not merged:
         return {
-            "date": trade_date_str,
-            "strike": strike,
-            "expiry": expiry_date,
-            "ce_symbol": ce_symbol,
-            "pe_symbol": pe_symbol,
-            "error": "no_overlapping_bars",
+            **base_info,
+            "error": "no_overlapping_bars_across_all_6_legs",
             "series": [],
             "entries": [],
             "day_pnl": 0.0,
         }
 
-    # --- 3. VWAP from market open --------------------------------------------
+    # --- 3. Combined VWAP from market open -----------------------------------
     vwap_values = compute_cumulative_vwap(merged)
     for bar, vwap in zip(merged, vwap_values):
         bar["vwap"] = vwap
@@ -129,37 +146,36 @@ def run_day_backtest(trade_date_str, fyers_client):
     signal_epoch = ist_to_epoch(ist_datetime(trade_date_str, config.SIGNAL_START_TIME))
     squareoff_epoch = ist_to_epoch(ist_datetime(trade_date_str, config.SQUARE_OFF_TIME))
 
-    # --- 4. Walk the series: detect fresh downward VWAP crossings -----------
-    entries = []          # each: {entry_epoch, entry_price, straddle_num}
+    # --- 4. Walk the series: detect fresh downward crossings -> sell basket -
+    entries = []
     was_below_vwap = False
-    straddles_deployed = 0
+    baskets_deployed = 0
 
     for bar in merged:
         if bar["epoch"] < signal_epoch:
-            # still track above/below state through the pre-signal window so we
-            # don't fire a false "fresh cross" right at 09:45 if it was already
-            # below vwap beforehand
             was_below_vwap = bar["price"] < bar["vwap"]
             continue
-
         if bar["epoch"] >= squareoff_epoch:
             break
 
         is_below = bar["price"] < bar["vwap"]
         fresh_cross_down = is_below and not was_below_vwap
 
-        if fresh_cross_down and straddles_deployed < config.MAX_STRADDLES_PER_DAY:
-            straddles_deployed += 1
+        at_cap = (config.MAX_BASKETS_PER_DAY is not None
+                  and baskets_deployed >= config.MAX_BASKETS_PER_DAY)
+
+        if fresh_cross_down and not at_cap:
+            baskets_deployed += 1
             entries.append({
+                "basket_num": baskets_deployed,
                 "entry_epoch": bar["epoch"],
                 "entry_time": epoch_to_ist_time_str(bar["epoch"]),
                 "entry_price": bar["price"],
-                "straddle_num": straddles_deployed,
             })
 
         was_below_vwap = is_below
 
-    # --- 5. Square off all open entries at 15:15 -----------------------------
+    # --- 5. Square off all open baskets at 15:15 -----------------------------
     squareoff_bar = _find_spot_at(merged, squareoff_epoch)
     exit_price = squareoff_bar["price"] if squareoff_bar else None
     exit_time = epoch_to_ist_time_str(squareoff_bar["epoch"]) if squareoff_bar else config.SQUARE_OFF_TIME
@@ -170,23 +186,19 @@ def run_day_backtest(trade_date_str, fyers_client):
             e["exit_price"] = None
             e["pnl"] = 0.0
             continue
-        # SHORT straddle: profit = (entry_price - exit_price) * qty
-        pnl = (e["entry_price"] - exit_price) * qty_per_leg_per_straddle
+        # SHORT basket (3 straddles, 6 legs): profit = (entry - exit) * qty_per_leg
+        # (combined price already sums all 6 legs at 1 lot each, so a single
+        # multiply by qty_per_leg gives total basket PnL)
+        pnl = (e["entry_price"] - exit_price) * qty_per_leg
         e["exit_price"] = exit_price
         e["exit_time"] = exit_time
         e["pnl"] = pnl
         day_pnl += pnl
 
     return {
-        "date": trade_date_str,
-        "strike": strike,
-        "expiry": expiry_date,
-        "ce_symbol": ce_symbol,
-        "pe_symbol": pe_symbol,
-        "lot_size": lot_size,
-        "qty_per_leg_per_straddle": qty_per_leg_per_straddle,
+        **base_info,
         "series": merged,
         "entries": entries,
         "day_pnl": day_pnl,
-        "num_straddles_deployed": straddles_deployed,
+        "num_baskets_deployed": baskets_deployed,
     }

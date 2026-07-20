@@ -1,18 +1,18 @@
-# Nifty Straddle-VWAP Backtest
+# Nifty 3-Straddle Basket VWAP Backtest
 
-Backtests a short-straddle mean-reversion strategy on Nifty weekly options using the Fyers v3 history API, with a Plotly dashboard (tabs per day) auto-deployed to GitHub Pages via GitHub Actions.
+Backtests a 3-straddle basket mean-reversion strategy on Nifty weekly options using the Fyers v3 history API, with a Plotly dashboard (tabs per day) auto-deployed to GitHub Pages via GitHub Actions.
 
 ## Strategy
 
-1. **09:45 IST** — sample Nifty spot, round to nearest 100 (both directions) → fixes the ATM strike for the day.
-2. Build the **combined straddle** (ATM CE + ATM PE) 1-min price series for the full day, and its **cumulative VWAP** starting from market open (09:15).
-3. From 09:45 onward, every **fresh downward crossing** of the straddle price below its own VWAP → **sell 1 straddle** (1 lot CE + 1 lot PE), up to a cap of **3 straddles/day**.
-4. All open straddles are **squared off together at 15:15** — pure time exit, no intraday stop/target.
+1. **09:45 IST** — sample Nifty spot, round to nearest 100 (both directions) → fixes the ATM strike for the day. Two more strikes are derived: **ATM-100** and **ATM+100** (`config.STRIKE_OFFSETS`).
+2. Build the **combined price** series = sum of all 6 legs' 1-min close prices (ATM-100 CE+PE, ATM CE+PE, ATM+100 CE+PE), and its **combined VWAP** (cumulative, using summed volume across all 6 legs) starting from market open (09:15).
+3. From 09:45 onward, every **fresh downward crossing** of the combined price below its own combined VWAP → **sell the full basket**: 1 lot each of the ATM-100, ATM, and ATM+100 straddles (6 legs, 1 lot each). This **repeats on every fresh cross** — exposure compounds through the day (no cap by default).
+4. All open baskets are **squared off together at 15:15** — pure time exit, no intraday stop/target.
 
-### Design decision worth double-checking
-You gave two answers that needed reconciling: "re-enter every time it dips below VWAP" + "3 lots total exposure". I implemented this as: **each fresh VWAP cross sells 1 straddle, capped at 3 for the day**, all closed together at 15:15. If you actually meant something else (e.g. exit+re-enter each time, always at 3 lots per entry, or a cap higher/lower than 3), it's a one-line change:
-- `config.MAX_STRADDLES_PER_DAY` — total cap
-- `config.LOTS_PER_STRADDLE_ENTRY` — lots per leg per entry
+### Tunables
+- `config.STRIKE_OFFSETS` — which strikes make up the basket relative to ATM (default `[-100, 0, 100]`)
+- `config.LOTS_PER_LEG_PER_BASKET` — lots per leg per basket (default 1)
+- `config.MAX_BASKETS_PER_DAY` — cap on baskets sold per day; `None` = unlimited (default). Worth considering setting a cap here given exposure compounds uncapped by default — a few bad reversal days could stack up fast.
 - The crossing logic itself is in `src/straddle_backtest.py`, `run_day_backtest()`, the "walk the series" loop.
 
 ## Known caveats (please verify before trusting PnL numbers)
@@ -33,7 +33,7 @@ You gave two answers that needed reconciling: "re-enter every time it dips below
 
 2. **Enable Pages**: Settings → Pages → Source = "GitHub Actions".
 
-3. **Set your backtest range** in `config.py` (`BACKTEST_START_DATE` / `BACKTEST_END_DATE`), or pass them as workflow inputs when manually triggering the Action.
+3. **Backtest range** is already set to `2026-07-14` → `2026-07-20` in `config.py` (`BACKTEST_START_DATE` / `BACKTEST_END_DATE`) — change it there, or pass different dates as workflow inputs when manually triggering the Action. Expiry for this window resolves to 2026-07-21 (Tuesday), i.e. `26721` in Fyers' weekly code — confirmed this matches by running `src/expiry_utils.get_weekly_expiry()` directly.
 
 4. **Run locally first** (recommended, to catch symbol/expiry issues before burning API calls in CI):
    ```bash
