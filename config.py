@@ -41,7 +41,7 @@ CANDLE_RESOLUTION = "1"                     # 1-minute candles
 # Weekly Nifty expiry was Thursday until Sept 2025, shifted to Tuesday after.
 # This date is the cutover - the LAST Thursday-expiry week before the switch.
 # Verify against the official NSE circular before relying on this for real trades.
-WEEKLY_EXPIRY_SWITCH_DATE = "2025-09-01"    # from this date onward -> Tuesday expiry
+WEEKLY_EXPIRY_SWITCH_DATE = "202-07-21"    # from this date onward -> Tuesday expiry
 EXPIRY_WEEKDAY_BEFORE_SWITCH = 3             # Thursday (Mon=0 ... Sun=6)
 EXPIRY_WEEKDAY_AFTER_SWITCH = 1              # Tuesday
 
@@ -55,8 +55,8 @@ NSE_HOLIDAYS = set([
 # ---------------------------------------------------------------------------
 # Backtest date range
 # ---------------------------------------------------------------------------
-BACKTEST_START_DATE = "2025-11-01"          # YYYY-MM-DD, override via env/CLI
-BACKTEST_END_DATE = "2025-11-30"
+BACKTEST_START_DATE = "2026-07-14"          # YYYY-MM-DD, override via env/CLI
+BACKTEST_END_DATE = "2026-07-20"
 
 # ---------------------------------------------------------------------------
 # Fyers API
