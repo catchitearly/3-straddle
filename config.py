@@ -29,7 +29,7 @@ LOTS_PER_LEG_PER_BASKET = 1                 # 1 lot on each of the 6 legs per ba
 # Every fresh downward cross of combined-price below combined-VWAP (after
 # 09:45) sells one full basket again - exposure compounds. Set an int here to
 # cap the number of baskets sold per day; leave as None for unlimited.
-MAX_BASKETS_PER_DAY = 3
+MAX_BASKETS_PER_DAY = None
 
 # ATR trailing-stop exit (added alongside the VWAP-cross exit and 15:15 time
 # exit). ATR here is computed on the combined basket price series itself
@@ -70,8 +70,8 @@ NSE_HOLIDAYS = set([
 # ---------------------------------------------------------------------------
 # Backtest date range
 # ---------------------------------------------------------------------------
-BACKTEST_START_DATE = "2026-07-21"          # YYYY-MM-DD, override via env/CLI
-BACKTEST_END_DATE = "2026-07-21"
+BACKTEST_START_DATE = "2026-07-14"          # YYYY-MM-DD, override via env/CLI
+BACKTEST_END_DATE = "2026-07-20"
 
 # ---------------------------------------------------------------------------
 # Fyers API

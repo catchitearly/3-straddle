@@ -64,7 +64,9 @@ src/straddle_backtest.py      # core strategy engine (one day at a time)
 src/dashboard_generator.py    # Plotly HTML dashboard, tabs per day, lazy rendering
 run_backtest.py                # main entrypoint - loops over the date range
 live_notifier.py                # live entry/exit checker + Telegram alerts (cron-job.org triggered)
+render_pages.py                  # rebuilds BOTH index.html and live.html together before every Pages deploy
 src/telegram_notifier.py        # minimal Telegram Bot API sender
+src/live_dashboard.py            # renders output/live.html from live_notifier's state
 test_synthetic.py              # smoke test with fabricated data, no API calls needed
 test_live_notifier.py           # simulates a full day of 2-min live-notifier runs
 .github/workflows/backtest.yml # CI: run backtest -> deploy to Pages
@@ -101,7 +103,7 @@ cron-job.org (every 2 min)  --POST-->  GitHub repository_dispatch API
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_CHAT_ID`
 
-3. **GitHub Personal Access Token** for cron-job.org to trigger the workflow: Settings → Developer settings → Fine-grained tokens → new token, scoped to this repo only, with **Contents: Read and write** and **Actions: Read and write** permissions. Copy it — you won't see it again.
+3. **GitHub Personal Access Token** for cron-job.org to trigger the workflow: Settings → Developer settings → Fine-grained tokens → new token, scoped to this repo only (Resource owner = your account, Repository access = "Only select repositories" → this repo). Under **Repository permissions**, set **Contents: Read and write** — that's the only permission the `repository_dispatch` endpoint actually checks; leave everything else at "No access." Copy the token — you won't see it again. Fine-grained tokens expire after at most a year, so put a reminder in to rotate it.
 
 4. **Configure the cron-job.org job**:
    - URL: `https://api.github.com/repos/<your-username>/<your-repo>/dispatches`
@@ -124,6 +126,15 @@ cron-job.org (every 2 min)  --POST-->  GitHub repository_dispatch API
 - State resets automatically at the start of a new trading day (compares `data/live_state.json`'s stored date against today).
 - If square-off can't get a valid exit price (data hiccup), it retries on the next run rather than silently giving up.
 - Test the whole day's state machine locally without spending API calls or needing real Telegram creds: `python test_live_notifier.py` (simulates 2-min-interval runs against the synthetic data generator, prints every alert that would have fired).
+
+### Both workflows keep the Pages site in sync
+
+GitHub Pages only serves **one artifact at a time** — if `backtest.yml` and `live_notifier.yml` each only rebuilt their own page before deploying, every deploy from either one would silently wipe out the other's page. To avoid that, both workflows run `render_pages.py` right before uploading the Pages artifact:
+
+- It rebuilds `output/index.html` (backtest tabs) from whatever's in the committed `output/results.json`, if it exists — otherwise writes a small placeholder that links to the live page.
+- It rebuilds `output/live.html` (today's live status: strike, current price vs VWAP, every entry/exit so far) from `data/live_state.json`, if it exists.
+
+So a live-notifier run (every 2 minutes) redeploys the *whole* site with both pages current, and a manual backtest run does the same. They also share the same `pages` concurrency group so overlapping deploys queue instead of racing. `output/live.html` links back to `output/index.html` and vice versa.
 
 ## Testing without live API access
 

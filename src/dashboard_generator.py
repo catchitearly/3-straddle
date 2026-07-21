@@ -186,6 +186,7 @@ def _build_html(payloads, summary):
 </head>
 <body>
 
+<div class="nav" style="margin-bottom:16px; font-size:13px;"><a href="live.html" style="color:#4f8cff; text-decoration:none;">Live status &rarr;</a></div>
 <h1>Nifty 3-Straddle Basket &middot; VWAP Mean-Reversion Backtest</h1>
 <div class="subtitle">ATM-100 / ATM / ATM+100 straddles fixed at 09:45 &middot; sell basket on downward VWAP cross (repeats on every fresh cross) &middot; square-off 15:15</div>
 

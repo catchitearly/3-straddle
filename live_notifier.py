@@ -55,6 +55,9 @@ def _empty_state(date_str):
         "baskets_deployed": 0,
         "entries": [],
         "squared_off": False,
+        "last_price": None,
+        "last_vwap": None,
+        "last_updated": None,
     }
 
 
@@ -155,6 +158,10 @@ def check_market(state, date_str, client):
 
     is_below = price < vwap
     is_above = price > vwap
+
+    state["last_price"] = price
+    state["last_vwap"] = vwap
+    state["last_updated"] = entry_time
 
     # --- Check exits on currently open baskets ------------------------------
     for e in state["entries"]:
