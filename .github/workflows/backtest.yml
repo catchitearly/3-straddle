@@ -6,11 +6,11 @@ on:
       start_date:
         description: "Backtest start date (YYYY-MM-DD)"
         required: false
-        default: ""
+        default: "2026-07-21"
       end_date:
         description: "Backtest end date (YYYY-MM-DD)"
         required: false
-        default: ""
+        default: "2026-07-21"
 
 permissions:
   contents: write  # <-- Fixed: changed from 'read' to 'write'
