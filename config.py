@@ -29,7 +29,15 @@ LOTS_PER_LEG_PER_BASKET = 1                 # 1 lot on each of the 6 legs per ba
 # Every fresh downward cross of combined-price below combined-VWAP (after
 # 09:45) sells one full basket again - exposure compounds. Set an int here to
 # cap the number of baskets sold per day; leave as None for unlimited.
-MAX_BASKETS_PER_DAY = 3 #None
+MAX_BASKETS_PER_DAY = 3
+
+# ATR trailing-stop exit (added alongside the VWAP-cross exit and 15:15 time
+# exit). ATR here is computed on the combined basket price series itself
+# (see src/straddle_backtest.compute_basket_atr) since we don't have true
+# high/low ticks for the synthetic combined series - it's a close-to-close
+# proxy, not textbook ATR.
+ATR_PERIOD = 14
+ATR_MULTIPLIER = 2.0
 
 # ---------------------------------------------------------------------------
 # Timing (all times are IST / Asia-Kolkata, NOT server local time)
@@ -62,8 +70,8 @@ NSE_HOLIDAYS = set([
 # ---------------------------------------------------------------------------
 # Backtest date range
 # ---------------------------------------------------------------------------
-BACKTEST_START_DATE = "2026-07-14"          # YYYY-MM-DD, override via env/CLI
-BACKTEST_END_DATE = "2026-07-20"
+BACKTEST_START_DATE = "2026-07-21"          # YYYY-MM-DD, override via env/CLI
+BACKTEST_END_DATE = "2026-07-21"
 
 # ---------------------------------------------------------------------------
 # Fyers API

@@ -21,26 +21,58 @@ def compute_basket_atr(merged_series, period=14):
     """
     atr_values = []
     prices = [bar["price"] for bar in merged_series]
-    
+
     for i in range(len(prices)):
         if i < period:
             # Fallback estimation for initial bars: 1% of basket price as baseline volatility
             atr_values.append(prices[i] * 0.01)
             continue
-            
+
         # Calculate Average True Range over period
         tr_list = [abs(prices[j] - prices[j-1]) for j in range(i - period + 1, i + 1)]
         atr = sum(tr_list) / period
         atr_values.append(atr)
-        
+
     return atr_values
 
 
-def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=2.0):
+def merge_basket_series(leg_candles_by_symbol):
     """
-    atr_multiplier: 2.0 provides a good balance between avoiding noise stop-outs
-                   and protecting peak profits.
+    leg_candles_by_symbol: dict of symbol -> list of candle dicts (6 entries:
+    3 strikes x CE/PE).
+
+    Merge on epochs common to ALL legs into a combined basket series:
+        [{"epoch", "price" (sum of closes), "volume" (sum of volumes),
+          "legs": {symbol: close, ...}}, ...]
+    Timestamps missing from any single leg are dropped (illiquid/missing minute).
     """
+    symbols = list(leg_candles_by_symbol.keys())
+    if not symbols:
+        return []
+
+    by_epoch = {sym: {c["epoch"]: c for c in candles}
+                for sym, candles in leg_candles_by_symbol.items()}
+    common_epochs = set.intersection(*(set(by_epoch[sym].keys()) for sym in symbols))
+
+    merged = []
+    for epoch in sorted(common_epochs):
+        total_price = sum(by_epoch[sym][epoch]["close"] for sym in symbols)
+        total_vol = sum(by_epoch[sym][epoch].get("volume") or 0 for sym in symbols)
+        legs = {sym: by_epoch[sym][epoch]["close"] for sym in symbols}
+        merged.append({"epoch": epoch, "price": total_price, "volume": total_vol, "legs": legs})
+
+    return merged
+
+
+def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=None):
+    """
+    atr_multiplier: defaults to config.ATR_MULTIPLIER (2.0) - provides a good
+                   balance between avoiding noise stop-outs and protecting
+                   peak profits.
+    """
+    atr_multiplier = config.ATR_MULTIPLIER if atr_multiplier is None else atr_multiplier
+    atr_period = config.ATR_PERIOD
+
     lot_size = config.get_lot_size(trade_date_str)
     qty_per_leg = config.LOTS_PER_LEG_PER_BASKET * lot_size
 
@@ -86,25 +118,14 @@ def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=2.0):
     if missing:
         return {**base_info, "error": f"missing_option_data: {', '.join(missing)}", "series": [], "entries": [], "day_pnl": 0.0}
 
-    # Merge into basket series
-    symbols = list(leg_candles_by_symbol.keys())
-    by_epoch = {sym: {c["epoch"]: c for c in candles} for sym, candles in leg_candles_by_symbol.items()}
-    common_epochs = set.intersection(*(set(by_epoch[sym].keys()) for sym in symbols)) if symbols else set()
-
-    merged = []
-    for epoch in sorted(common_epochs):
-        total_price = sum(by_epoch[sym][epoch]["close"] for sym in symbols)
-        total_vol = sum(by_epoch[sym][epoch].get("volume") or 0 for sym in symbols)
-        legs = {sym: by_epoch[sym][epoch]["close"] for sym in symbols}
-        merged.append({"epoch": epoch, "price": total_price, "volume": total_vol, "legs": legs})
-
+    merged = merge_basket_series(leg_candles_by_symbol)
     if not merged:
         return {**base_info, "error": "no_overlapping_bars", "series": [], "entries": [], "day_pnl": 0.0}
 
     # --- 3. Compute VWAP & ATR ---
     vwap_values = compute_cumulative_vwap(merged)
-    atr_values = compute_basket_atr(merged, period=14)
-    
+    atr_values = compute_basket_atr(merged, period=atr_period)
+
     for bar, vwap, atr in zip(merged, vwap_values, atr_values):
         bar["vwap"] = vwap
         bar["atr"] = atr
@@ -148,11 +169,11 @@ def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=2.0):
         remaining_active = []
         for b in active_baskets:
             idx = b["idx"]
-            
+
             # Record lowest price reached (High-Water Mark for Short trade)
             if price < b["min_price"]:
                 b["min_price"] = price
-                # Update trailing stop line: min_price + (2.0 * ATR)
+                # Update trailing stop line: min_price + (atr_multiplier * ATR)
                 b["trailing_stop"] = b["min_price"] + (atr_multiplier * atr)
 
             # CHECK EXITS
@@ -201,7 +222,7 @@ def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=2.0):
                 "pnl": 0.0,
             }
             entries.append(e_dict)
-            
+
             # Track min_price and trailing stop level
             active_baskets.append({
                 "idx": len(entries) - 1,

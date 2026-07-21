@@ -6,14 +6,20 @@ Backtests a 3-straddle basket mean-reversion strategy on Nifty weekly options us
 
 1. **09:45 IST** — sample Nifty spot, round to nearest 100 (both directions) → fixes the ATM strike for the day. Two more strikes are derived: **ATM-100** and **ATM+100** (`config.STRIKE_OFFSETS`).
 2. Build the **combined price** series = sum of all 6 legs' 1-min close prices (ATM-100 CE+PE, ATM CE+PE, ATM+100 CE+PE), and its **combined VWAP** (cumulative, using summed volume across all 6 legs) starting from market open (09:15).
-3. From 09:45 onward, every **fresh downward crossing** of the combined price below its own combined VWAP → **sell the full basket**: 1 lot each of the ATM-100, ATM, and ATM+100 straddles (6 legs, 1 lot each). This **repeats on every fresh cross** — exposure compounds through the day (no cap by default).
-4. All open baskets are **squared off together at 15:15** — pure time exit, no intraday stop/target.
+3. **Entry**: the very first bar at/after 09:45 enters immediately if price < VWAP. After that, every **fresh downward crossing** of combined price below VWAP deploys another basket (1 lot each of ATM-100/ATM/ATM+100 straddles, 6 legs) — this repeats through the day, capped only by `config.MAX_BASKETS_PER_DAY` (default: uncapped).
+4. **Exit** — each basket exits independently, whichever comes first:
+   - price crosses back **above VWAP** ("Price > VWAP Exit"), or
+   - price rallies back up through its **ATR trailing stop** (`config.ATR_MULTIPLIER` x ATR above the lowest price seen since entry — a favorable move gets a tighter stop as it goes), or
+   - **15:15 IST time exit** for anything still open.
+
+   ATR here (`compute_basket_atr` in `src/straddle_backtest.py`) is a close-to-close proxy computed on the combined basket series itself, since we don't have true high/low ticks for a synthetically-summed 6-leg series — not textbook ATR, but a consistent volatility proxy for the trailing-stop distance.
 
 ### Tunables
 - `config.STRIKE_OFFSETS` — which strikes make up the basket relative to ATM (default `[-100, 0, 100]`)
 - `config.LOTS_PER_LEG_PER_BASKET` — lots per leg per basket (default 1)
-- `config.MAX_BASKETS_PER_DAY` — cap on baskets sold per day; `None` = unlimited (default). Worth considering setting a cap here given exposure compounds uncapped by default — a few bad reversal days could stack up fast.
-- The crossing logic itself is in `src/straddle_backtest.py`, `run_day_backtest()`, the "walk the series" loop.
+- `config.MAX_BASKETS_PER_DAY` — cap on baskets sold per day; `None` = unlimited (default)
+- `config.ATR_PERIOD` / `config.ATR_MULTIPLIER` — trailing-stop tuning (default 14-bar / 2.0x)
+- The core loop is in `src/straddle_backtest.py`, `run_day_backtest()`.
 
 ## Known caveats (please verify before trusting PnL numbers)
 

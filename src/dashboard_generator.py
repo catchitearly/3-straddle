@@ -46,6 +46,7 @@ def _day_payload(result):
             "entry_price": round(e["entry_price"], 2),
             "exit_time": e.get("exit_time"),
             "exit_price": round(e["exit_price"], 2) if e.get("exit_price") is not None else None,
+            "exit_reason": e.get("exit_reason"),
             "pnl": round(e.get("pnl", 0.0), 2),
         })
 
@@ -246,6 +247,7 @@ function buildDayPanel(idx) {{
       <td>${{e.entry_price}}</td>
       <td>${{e.exit_time || '-'}}</td>
       <td>${{e.exit_price != null ? e.exit_price : '-'}}</td>
+      <td>${{e.exit_reason || '-'}}</td>
       <td class="${{e.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}}">${{e.pnl >= 0 ? '+' : ''}}${{e.pnl}}</td>
     </tr>`).join('');
 
@@ -260,8 +262,8 @@ function buildDayPanel(idx) {{
     <div class="chart-box"><div id="pnl-chart-${{idx}}" style="height:220px;"></div></div>
     <div class="chart-box">
       <table>
-        <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>PnL</th></tr></thead>
-        <tbody>${{entryRows || '<tr><td colspan="6" class="no-data">No entries fired this day</td></tr>'}}</tbody>
+        <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
+        <tbody>${{entryRows || '<tr><td colspan="7" class="no-data">No entries fired this day</td></tr>'}}</tbody>
       </table>
     </div>`;
   return panel;

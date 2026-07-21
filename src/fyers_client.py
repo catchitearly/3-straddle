@@ -58,13 +58,18 @@ class FyersHistoryClient:
         )
 
     def get_day_candles(self, symbol, date_str, resolution=None, use_cache=True,
-                         max_retries=3):
+                         persist_cache=True, max_retries=3):
         """
         Fetch 1-minute (or given resolution) candles for `symbol` on `date_str`
         (YYYY-MM-DD). Returns a list of dicts:
             [{"epoch": int, "open": f, "high": f, "low": f, "close": f, "volume": int}, ...]
         sorted ascending by epoch. Returns [] if no data (e.g. holiday, or
         history not available for that far back).
+
+        persist_cache=False is used for "today, in progress" live fetches -
+        the day isn't over yet, so we don't want to cache a partial result as
+        if it were final (and don't want to churn the backtest cache dir on
+        every 2-minute live-notifier run).
         """
         resolution = resolution or config.CANDLE_RESOLUTION
         cache_path = self._cache_path(symbol, date_str, resolution)
@@ -112,7 +117,8 @@ class FyersHistoryClient:
 
         candles.sort(key=lambda c: c["epoch"])
 
-        with open(cache_path, "w") as f:
-            json.dump(candles, f)
+        if persist_cache:
+            with open(cache_path, "w") as f:
+                json.dump(candles, f)
 
         return candles
