@@ -1,0 +1,24 @@
+{
+  "date": "2026-07-21",
+  "strike_fixed": true,
+  "atm_strike": 24200,
+  "strikes": [
+    24100,
+    24200,
+    24300
+  ],
+  "expiry": "2026-07-21",
+  "leg_symbols": [
+    "NSE:NIFTY2672124100CE",
+    "NSE:NIFTY2672124100PE",
+    "NSE:NIFTY2672124200CE",
+    "NSE:NIFTY2672124200PE",
+    "NSE:NIFTY2672124300CE",
+    "NSE:NIFTY2672124300PE"
+  ],
+  "was_below_vwap": false,
+  "first_check_done": false,
+  "baskets_deployed": 0,
+  "entries": [],
+  "squared_off": false
+}
