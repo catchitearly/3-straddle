@@ -12,10 +12,14 @@ on:
 permissions:
   contents: write
 
-# Runs must NOT overlap - two runs racing on the same state file would double
-# up entries and fight over the git push. Queue instead of running parallel.
+# Pages here is deployed from the /docs folder on this branch (Settings ->
+# Pages -> Source = "Deploy from a branch", branch = main /docs) - so there
+# is NO separate deploy-pages step in this workflow. Committing the updated
+# docs/ folder is enough; GitHub republishes automatically, usually within
+# a minute. Shared "docs-pages" group with backtest.yml so every run that
+# touches docs/ or data/*.json queues through one lane instead of racing.
 concurrency:
-  group: live-notifier
+  group: "docs-pages"
   cancel-in-progress: false
 
 jobs:
@@ -40,12 +44,15 @@ jobs:
       - name: Run live notifier
         run: python live_notifier.py
 
-      - name: Commit state back to repo
+      - name: Rebuild combined pages site (backtest + live status)
+        run: python render_pages.py
+
+      - name: Commit state + docs/ back to repo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/live_state.json
-          git diff --staged --quiet || git commit -m "Update live state [skip ci]"
+          git add data/live_state.json docs/
+          git diff --staged --quiet || git commit -m "Update live state + pages [skip ci]"
           # pull --rebase guards against a slow-finishing previous run having
           # already pushed while this one was mid-flight
           git pull --rebase origin HEAD
