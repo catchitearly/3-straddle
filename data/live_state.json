@@ -27,11 +27,11 @@
       "entry_price": 342.2,
       "min_price": 342.2,
       "trailing_stop": 346.00714285714287,
-      "exit_price": null,
-      "exit_time": null,
-      "exit_reason": null,
-      "pnl": null
+      "exit_price": 342.2,
+      "exit_time": "15:15",
+      "exit_reason": "15:15 Time Exit",
+      "pnl": 0.0
     }
   ],
-  "squared_off": false
+  "squared_off": true
 }
