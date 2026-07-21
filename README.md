@@ -57,11 +57,67 @@ src/fyers_client.py           # Fyers v3 history API wrapper + local JSON cachin
 src/straddle_backtest.py      # core strategy engine (one day at a time)
 src/dashboard_generator.py    # Plotly HTML dashboard, tabs per day, lazy rendering
 run_backtest.py                # main entrypoint - loops over the date range
+live_notifier.py                # live entry/exit checker + Telegram alerts (cron-job.org triggered)
+src/telegram_notifier.py        # minimal Telegram Bot API sender
 test_synthetic.py              # smoke test with fabricated data, no API calls needed
+test_live_notifier.py           # simulates a full day of 2-min live-notifier runs
 .github/workflows/backtest.yml # CI: run backtest -> deploy to Pages
+.github/workflows/live_notifier.yml  # CI: triggered by cron-job.org, runs live_notifier.py
 ```
 
 No numpy/pandas anywhere in core logic, per your usual constraint — everything is pure Python (VWAP, PnL, expiry math all hand-rolled).
+
+## Live Telegram notifier (entries/exits, every 2 minutes)
+
+`live_notifier.py` checks the live combined-basket price against VWAP and sends Telegram alerts on entries and the final square-off — same crossing logic as the backtest, evaluated incrementally.
+
+**Why it's built this way:** cron-job.org can only call a URL on a schedule — it can't run a script on your machine directly. So the flow is:
+
+```
+cron-job.org (every 2 min)  --POST-->  GitHub repository_dispatch API
+                                              |
+                                              v
+                          .github/workflows/live_notifier.yml runs
+                                              |
+                                              v
+                    live_notifier.py checks price vs VWAP, alerts Telegram
+                                              |
+                                              v
+                  data/live_state.json committed back to repo (persists
+                  which baskets have already fired, across ephemeral runs)
+```
+
+### Setup
+
+1. **Telegram bot**: message [@BotFather](https://t.me/BotFather) → `/newbot` → get your bot token. Message your new bot once, then hit `https://api.telegram.org/bot<TOKEN>/getUpdates` to find your `chat_id`.
+
+2. **Add secrets** (same place as `FYERS_APP_ID`/`FYERS_ACCESS_TOKEN`):
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_CHAT_ID`
+
+3. **GitHub Personal Access Token** for cron-job.org to trigger the workflow: Settings → Developer settings → Fine-grained tokens → new token, scoped to this repo only, with **Contents: Read and write** and **Actions: Read and write** permissions. Copy it — you won't see it again.
+
+4. **Configure the cron-job.org job**:
+   - URL: `https://api.github.com/repos/<your-username>/<your-repo>/dispatches`
+   - Method: `POST`
+   - Schedule: every 2 minutes
+   - Headers:
+     - `Authorization: Bearer <your PAT from step 3>`
+     - `Accept: application/vnd.github+json`
+     - `Content-Type: application/json`
+   - Body: `{"event_type": "live_check"}`
+
+   Note cron-job.org's free tier may not support sub-5-minute intervals — check their current plan limits if 2 minutes isn't available.
+
+5. **Test it manually first**: Actions tab → "Live Straddle Notifier" → Run workflow, to confirm secrets/permissions are wired up before relying on the external cron.
+
+### Behavior notes
+
+- Only fires between `STRIKE_FIX_TIME` (09:45) and `SQUARE_OFF_TIME` (15:15) — outside that window it just checks the time and exits (no API calls, no alerts).
+- **2-minute granularity is a real limitation**: a cross that happens and reverses within a 2-minute gap between runs will be missed or misread. This mirrors real intraday conditions but isn't the same as tick-by-tick monitoring — worth knowing before trusting it fully for live trading.
+- State resets automatically at the start of a new trading day (compares `data/live_state.json`'s stored date against today).
+- If square-off can't get a valid exit price (data hiccup), it retries on the next run rather than silently giving up.
+- Test the whole day's state machine locally without spending API calls or needing real Telegram creds: `python test_live_notifier.py` (simulates 2-min-interval runs against the synthetic data generator, prints every alert that would have fired).
 
 ## Testing without live API access
 
