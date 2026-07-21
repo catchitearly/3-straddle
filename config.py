@@ -84,9 +84,9 @@ FYERS_ACCESS_TOKEN_ENV = "FYERS_ACCESS_TOKEN"
 # Paths
 # ---------------------------------------------------------------------------
 CACHE_DIR = "data/cache"
-OUTPUT_DIR = "output"
-OUTPUT_HTML = "output/index.html"
-RESULTS_JSON = "output/results.json"
+OUTPUT_DIR = "docs"
+OUTPUT_HTML = "docs/index.html"
+RESULTS_JSON = "docs/results.json"
 
 
 def get_lot_size(date_str):

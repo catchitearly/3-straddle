@@ -77,8 +77,8 @@ def main():
         results.append(r)
         print(date_str, "->", {k: v for k, v in r.items() if k not in ("series",)})
 
-    generate_dashboard(results, "output/index.html")
-    print("\nWrote output/index.html")
+    generate_dashboard(results, config.OUTPUT_HTML)
+    print(f"\nWrote {config.OUTPUT_HTML}")
 
 
 if __name__ == "__main__":

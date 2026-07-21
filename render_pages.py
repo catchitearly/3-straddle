@@ -1,13 +1,16 @@
 """
-Rebuilds output/index.html (backtest dashboard) and output/live.html (live
+Rebuilds docs/index.html (backtest dashboard) and docs/live.html (live
 notifier status) together from whatever is currently committed in the repo -
-data/live_state.json and output/results.json.
+data/live_state.json and docs/results.json.
 
 Both .github/workflows/backtest.yml and .github/workflows/live_notifier.yml
-run this right before uploading the Pages artifact. GitHub Pages serves one
-artifact at a time - if each workflow only regenerated its own page, every
-deploy would silently delete the other one. Running this in both workflows
-means every deploy always contains both pages, whichever triggered it.
+run this and then commit the docs/ folder. GitHub Pages here is set to
+"Deploy from a branch" pointing at /docs, so there's no separate deploy
+step - a fresh commit to docs/ is all it takes to republish. If each
+workflow only regenerated its own page, every commit would silently delete
+the other one, since docs/ is a single shared folder - running this in both
+workflows means every commit always contains both pages, whichever
+triggered it.
 """
 
 import json

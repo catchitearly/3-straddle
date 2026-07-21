@@ -37,7 +37,7 @@ Backtests a 3-straddle basket mean-reversion strategy on Nifty weekly options us
    - `FYERS_ACCESS_TOKEN`
    (You mentioned you already have these — same convention as your other Fyers projects.)
 
-2. **Enable Pages**: Settings → Pages → Source = "GitHub Actions".
+2. **Enable Pages**: Settings → Pages → Source = **"Deploy from a branch"**, Branch = `main`, Folder = **`/docs`**. This repo publishes via a committed `docs/` folder, not the Actions-based Pages deployment — there's no separate deploy step in either workflow; committing to `docs/` is all it takes, and GitHub republishes automatically (usually within a minute).
 
 3. **Backtest range** is already set to `2026-07-14` → `2026-07-20` in `config.py` (`BACKTEST_START_DATE` / `BACKTEST_END_DATE`) — change it there, or pass different dates as workflow inputs when manually triggering the Action. Expiry for this window resolves to 2026-07-21 (Tuesday), i.e. `26721` in Fyers' weekly code — confirmed this matches by running `src/expiry_utils.get_weekly_expiry()` directly.
 
@@ -47,10 +47,10 @@ Backtests a 3-straddle basket mean-reversion strategy on Nifty weekly options us
    export FYERS_APP_ID=...
    export FYERS_ACCESS_TOKEN=...
    python run_backtest.py 2025-11-01 2025-11-30
-   open output/index.html
+   open docs/index.html
    ```
 
-5. **Run in CI**: Actions tab → "Straddle VWAP Backtest" → Run workflow, optionally overriding the date range. The historical candle cache (`data/cache/`) and `output/results.json` get committed back to the repo so re-runs don't re-fetch days you've already pulled; the dashboard gets deployed to Pages automatically.
+5. **Run in CI**: Actions tab → "Straddle VWAP Backtest" → Run workflow, optionally overriding the date range. The historical candle cache (`data/cache/`) and `docs/results.json` get committed back to the repo so re-runs don't re-fetch days you've already pulled; the dashboard site (docs/) gets committed and Pages republishes automatically.
 
 ## Project layout
 
@@ -66,7 +66,7 @@ run_backtest.py                # main entrypoint - loops over the date range
 live_notifier.py                # live entry/exit checker + Telegram alerts (cron-job.org triggered)
 render_pages.py                  # rebuilds BOTH index.html and live.html together before every Pages deploy
 src/telegram_notifier.py        # minimal Telegram Bot API sender
-src/live_dashboard.py            # renders output/live.html from live_notifier's state
+src/live_dashboard.py            # renders docs/live.html from live_notifier's state
 test_synthetic.py              # smoke test with fabricated data, no API calls needed
 test_live_notifier.py           # simulates a full day of 2-min live-notifier runs
 .github/workflows/backtest.yml # CI: run backtest -> deploy to Pages
@@ -131,10 +131,10 @@ cron-job.org (every 2 min)  --POST-->  GitHub repository_dispatch API
 
 GitHub Pages only serves **one artifact at a time** — if `backtest.yml` and `live_notifier.yml` each only rebuilt their own page before deploying, every deploy from either one would silently wipe out the other's page. To avoid that, both workflows run `render_pages.py` right before uploading the Pages artifact:
 
-- It rebuilds `output/index.html` (backtest tabs) from whatever's in the committed `output/results.json`, if it exists — otherwise writes a small placeholder that links to the live page.
-- It rebuilds `output/live.html` (today's live status: strike, current price vs VWAP, every entry/exit so far) from `data/live_state.json`, if it exists.
+- It rebuilds `docs/index.html` (backtest tabs) from whatever's in the committed `docs/results.json`, if it exists — otherwise writes a small placeholder that links to the live page.
+- It rebuilds `docs/live.html` (today's live status: strike, current price vs VWAP, every entry/exit so far) from `data/live_state.json`, if it exists.
 
-So a live-notifier run (every 2 minutes) redeploys the *whole* site with both pages current, and a manual backtest run does the same. They also share the same `pages` concurrency group so overlapping deploys queue instead of racing. `output/live.html` links back to `output/index.html` and vice versa.
+So a live-notifier run (every 2 minutes) recommits the *whole* site with both pages current, and a manual backtest run does the same. They also share the same `docs-pages` concurrency group so overlapping deploys queue instead of racing. `docs/live.html` links back to `docs/index.html` and vice versa.
 
 ## Testing without live API access
 
@@ -142,5 +142,5 @@ So a live-notifier run (every 2 minutes) redeploys the *whole* site with both pa
 
 ```bash
 python test_synthetic.py
-open output/index.html
+open docs/index.html
 ```
