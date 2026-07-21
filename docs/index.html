@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nifty Straddle-VWAP Backtest</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.32.0/plotly.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --border: #2a2f3a;
+    --text: #e6e8ec; --muted: #8a90a0; --accent: #4f8cff;
+    --green: #2ecc71; --red: #ff5c5c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+    margin: 0; padding: 24px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px 0; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+  .summary {
+    display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .stat {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 18px; min-width: 120px;
+  }
+  .stat .label { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+  .stat .value { font-size: 18px; font-weight: 600; }
+  .stat .value.pos { color: var(--green); }
+  .stat .value.neg { color: var(--red); }
+
+  #equity-curve {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 20px; padding: 8px;
+  }
+
+  .tab-bar {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+    border-bottom: 1px solid var(--border); padding-bottom: 12px;
+  }
+  .tab-btn {
+    background: var(--panel); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px; font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab-btn:hover { border-color: var(--accent); }
+  .tab-btn.active { border-color: var(--accent); background: #1c2333; }
+  .pnl-badge { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 10px; }
+  .pnl-badge.pos { background: rgba(46,204,113,0.15); color: var(--green); }
+  .pnl-badge.neg { background: rgba(255,92,92,0.15); color: var(--red); }
+
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  .day-meta {
+    display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 10px;
+    font-size: 13px; color: var(--muted);
+  }
+  .day-meta b { color: var(--text); }
+
+  .chart-box {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px; margin-bottom: 14px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; }
+  td.pnl-pos { color: var(--green); }
+  td.pnl-neg { color: var(--red); }
+  .no-data { color: var(--muted); padding: 20px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="nav" style="margin-bottom:16px; font-size:13px;"><a href="live.html" style="color:#4f8cff; text-decoration:none;">Live status &rarr;</a></div>
+<h1>Nifty 3-Straddle Basket &middot; VWAP Mean-Reversion Backtest</h1>
+<div class="subtitle">ATM-100 / ATM / ATM+100 straddles fixed at 09:45 &middot; sell basket on downward VWAP cross (repeats on every fresh cross) &middot; square-off 15:15</div>
+
+<div class="summary">
+  <div class="stat"><div class="label">Total PnL</div>
+    <div class="value pos">&#8377;+0</div></div>
+  <div class="stat"><div class="label">Days</div><div class="value">1</div></div>
+  <div class="stat"><div class="label">Win Days</div><div class="value pos">0</div></div>
+  <div class="stat"><div class="label">Loss Days</div><div class="value neg">0</div></div>
+  <div class="stat"><div class="label">Baskets Sold</div><div class="value">1</div></div>
+</div>
+
+<div id="equity-curve"></div>
+
+<div class="tab-bar" id="tab-bar">
+  <button class="tab-btn" data-idx="0" onclick="selectTab(0)">2026-07-21<span class="pnl-badge pos">+0</span></button>
+</div>
+
+<div id="panels"></div>
+
+<script>
+const DAYS = [{"date": "2026-07-21", "atm_strike": 24200, "strikes": [24100, 24200, 24300], "expiry": "2026-07-21", "leg_symbols": ["NSE:NIFTY2672124100CE", "NSE:NIFTY2672124100PE", "NSE:NIFTY2672124200CE", "NSE:NIFTY2672124200PE", "NSE:NIFTY2672124300CE", "NSE:NIFTY2672124300PE"], "times": ["09:15", "09:16", "09:17", "09:18", "09:19", "09:20", "09:21", "09:22", "09:23", "09:24", "09:25", "09:26", "09:27", "09:28", "09:29", "09:30", "09:31", "09:32", "09:33", "09:34", "09:35", "09:36", "09:37", "09:38", "09:39", "09:40", "09:41", "09:42", "09:43", "09:44", "09:45", "09:46", "09:47", "09:48", "09:49", "09:50", "09:51"], "price": [409.75, 377.5, 378.0, 388.25, 388.5, 373.95, 381.25, 370.4, 364.4, 365.05, 363.15, 369.7, 366.4, 373.7, 368.5, 359.7, 361.3, 359.25, 356.25, 357.0, 355.7, 354.9, 355.35, 353.35, 347.85, 347.2, 348.6, 347.0, 345.3, 347.05, 343.5, 344.45, 342.35, 342.25, 341.7, 339.55, 342.2], "vwap": [409.75, 394.68, 390.86, 390.26, 389.98, 387.82, 387.15, 385.88, 384.29, 381.84, 379.96, 379.13, 378.16, 377.96, 377.67, 376.74, 375.96, 375.32, 374.46, 373.92, 372.82, 372.3, 371.48, 370.95, 370.48, 369.98, 369.65, 369.13, 368.64, 368.13, 367.57, 367.08, 366.67, 366.05, 365.66, 365.16, 364.61], "entries": [{"basket_num": 1, "entry_time": "09:45", "entry_price": 343.5, "exit_time": null, "exit_price": null, "exit_reason": null, "pnl": 0.0}], "day_pnl": 0.0, "num_baskets_deployed": 1}];
+const SUMMARY = {"total_days": 1, "win_days": 0, "loss_days": 0, "flat_days": 1, "total_pnl": 0.0, "total_baskets": 1, "equity_dates": ["2026-07-21"], "equity_curve": [0.0]};
+const renderedTabs = new Set();
+
+function drawEquityCurve() {
+  const trace = {
+    x: SUMMARY.equity_dates, y: SUMMARY.equity_curve,
+    type: 'scatter', mode: 'lines+markers', name: 'Cumulative PnL',
+    line: {color: '#4f8cff', width: 2}, marker: {size: 5}
+  };
+  const layout = {
+    title: {text: 'Cumulative PnL', font: {color: '#e6e8ec', size: 13}},
+    paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
+    font: {color: '#8a90a0', size: 11},
+    margin: {l: 50, r: 20, t: 30, b: 30}, height: 220,
+    xaxis: {gridcolor: '#2a2f3a'}, yaxis: {gridcolor: '#2a2f3a'}
+  };
+  Plotly.newPlot('equity-curve', [trace], layout, {displayModeBar: false, responsive: true});
+}
+
+function buildDayPanel(idx) {
+  const d = DAYS[idx];
+  const panel = document.createElement('div');
+  panel.className = 'day-panel';
+  panel.id = 'panel-' + idx;
+
+  if (d.error || d.times.length === 0) {
+    panel.innerHTML = `<div class="no-data">No usable data for ${d.date}` +
+      (d.strikes ? ` (strikes ${d.strikes.join(', ')})` : '') +
+      `: ${d.error || 'no data'}</div>`;
+    return panel;
+  }
+
+  const entryRows = d.entries.map(e => `
+    <tr>
+      <td>#${e.basket_num}</td>
+      <td>${e.entry_time}</td>
+      <td>${e.entry_price}</td>
+      <td>${e.exit_time || '-'}</td>
+      <td>${e.exit_price != null ? e.exit_price : '-'}</td>
+      <td>${e.exit_reason || '-'}</td>
+      <td class="${e.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}">${e.pnl >= 0 ? '+' : ''}${e.pnl}</td>
+    </tr>`).join('');
+
+  panel.innerHTML = `
+    <div class="day-meta">
+      <div>Strikes: <b>${d.strikes.join(' / ')}</b> (ATM ${d.atm_strike})</div>
+      <div>Expiry: <b>${d.expiry || '-'}</b></div>
+      <div>Baskets sold: <b>${d.num_baskets_deployed || 0}</b></div>
+      <div>Day PnL: <b class="${d.day_pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}">${d.day_pnl >= 0 ? '+' : ''}${d.day_pnl}</b></div>
+    </div>
+    <div class="chart-box"><div id="price-chart-${idx}" style="height:340px;"></div></div>
+    <div class="chart-box"><div id="pnl-chart-${idx}" style="height:220px;"></div></div>
+    <div class="chart-box">
+      <table>
+        <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
+        <tbody>${entryRows || '<tr><td colspan="7" class="no-data">No entries fired this day</td></tr>'}</tbody>
+      </table>
+    </div>`;
+  return panel;
+}
+
+function renderCharts(idx) {
+  const d = DAYS[idx];
+  if (d.error || d.times.length === 0) return;
+
+  const priceTrace = {
+    x: d.times, y: d.price, type: 'scatter', mode: 'lines',
+    name: 'Combined Straddle', line: {color: '#4f8cff', width: 1.6}
+  };
+  const vwapTrace = {
+    x: d.times, y: d.vwap, type: 'scatter', mode: 'lines',
+    name: 'VWAP', line: {color: '#ffb84f', width: 1.6, dash: 'dot'}
+  };
+  const entryTrace = {
+    x: d.entries.map(e => e.entry_time), y: d.entries.map(e => e.entry_price),
+    type: 'scatter', mode: 'markers+text', name: 'Sell Basket',
+    text: d.entries.map(e => '#' + e.basket_num),
+    textposition: 'top center', textfont: {color: '#ff5c5c', size: 10},
+    marker: {color: '#ff5c5c', size: 9, symbol: 'triangle-down'}
+  };
+
+  const priceLayout = {
+    title: {text: 'Combined 3-Straddle Basket Price vs VWAP', font: {color: '#e6e8ec', size: 13}},
+    paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
+    font: {color: '#8a90a0', size: 11},
+    margin: {l: 50, r: 20, t: 30, b: 30},
+    xaxis: {gridcolor: '#2a2f3a', nticks: 12}, yaxis: {gridcolor: '#2a2f3a'},
+    legend: {orientation: 'h', y: -0.2}
+  };
+  Plotly.newPlot('price-chart-' + idx, [priceTrace, vwapTrace, entryTrace], priceLayout,
+    {displayModeBar: false, responsive: true});
+
+  const pnlTrace = {
+    x: d.entries.map(e => '#' + e.basket_num + ' (' + e.entry_time + ')'),
+    y: d.entries.map(e => e.pnl), type: 'bar', name: 'PnL per basket',
+    marker: {color: d.entries.map(e => e.pnl >= 0 ? '#2ecc71' : '#ff5c5c')}
+  };
+  const pnlLayout = {
+    title: {text: 'PnL per Basket', font: {color: '#e6e8ec', size: 13}},
+    paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
+    font: {color: '#8a90a0', size: 11},
+    margin: {l: 50, r: 20, t: 30, b: 30},
+    xaxis: {gridcolor: '#2a2f3a'}, yaxis: {gridcolor: '#2a2f3a'}
+  };
+  Plotly.newPlot('pnl-chart-' + idx, [pnlTrace], pnlLayout, {displayModeBar: false, responsive: true});
+}
+
+function selectTab(idx) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-idx="${idx}"]`).classList.add('active');
+  document.getElementById('panel-' + idx).classList.add('active');
+
+  // Lazy render: only build the Plotly figure the first time this tab is
+  // shown, and only now that the container is actually visible (avoids the
+  // 0-width hidden-div rendering bug).
+  if (!renderedTabs.has(idx)) {
+    renderCharts(idx);
+    renderedTabs.add(idx);
+  } else {
+    // container was resized while hidden (e.g. window resize) - relayout
+    Plotly.Plots.resize('price-chart-' + idx);
+    Plotly.Plots.resize('pnl-chart-' + idx);
+  }
+}
+
+const panelsContainer = document.getElementById('panels');
+DAYS.forEach((d, idx) => panelsContainer.appendChild(buildDayPanel(idx)));
+
+drawEquityCurve();
+if (DAYS.length > 0) selectTab(0);
+</script>
+</body>
+</html>
