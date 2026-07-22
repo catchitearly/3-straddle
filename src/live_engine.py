@@ -36,7 +36,7 @@ def build_strike_plan(spot_price, date_str):
 
 def announce_strike_fixed(date_str, spot_price, atm_strike, strikes, expiry_date):
     send_telegram_message(
-        f"*Straddle basket fixed* — {date_str}\n"
+        f"*GH Straddle basket fixed* — {date_str}\n"
         f"Spot: {spot_price:.1f} -> ATM {atm_strike}\n"
         f"Strikes: {strikes[0]} / {strikes[1]} / {strikes[2]}\n"
         f"Expiry: {expiry_date}\n"
@@ -94,7 +94,7 @@ def evaluate_bar(state, date_str, bar):
             e["exit_reason"] = exit_reason
             e["pnl"] = pnl
             send_telegram_message(
-                f"*EXIT basket #{e['basket_num']}* — {date_str} {bar_time}\n"
+                f"*GH EXIT basket #{e['basket_num']}* — {date_str} {bar_time}\n"
                 f"Reason: {exit_reason}\n"
                 f"Entry {e['entry_price']:.2f} @ {e['entry_time']} -> Exit {price:.2f}\n"
                 f"PnL: {'+' if pnl >= 0 else ''}{pnl:.2f}"
@@ -127,7 +127,7 @@ def evaluate_bar(state, date_str, bar):
             "pnl": None,
         })
         send_telegram_message(
-            f"*SELL basket #{state['baskets_deployed']}* — {date_str} {bar_time}\n"
+            f"*GH SELL basket #{state['baskets_deployed']}* — {date_str} {bar_time}\n"
             f"Strikes {state['strikes'][0]}/{state['strikes'][1]}/{state['strikes'][2]} "
             f"(expiry {state['expiry']})\n"
             f"Combined price: {price:.2f} (VWAP {vwap:.2f})\n"
