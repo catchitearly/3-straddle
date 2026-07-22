@@ -16,7 +16,7 @@
     "NSE:NIFTY26JUL24100CE",
     "NSE:NIFTY26JUL24100PE"
   ],
-  "was_below_vwap": true,
+  "was_below_vwap": false,
   "first_check_done": true,
   "baskets_deployed": 1,
   "entries": [
@@ -34,7 +34,7 @@
     }
   ],
   "squared_off": false,
-  "last_price": 971.65,
-  "last_vwap": 988.4256229958888,
-  "last_updated": "10:24"
+  "last_price": 994.5,
+  "last_vwap": 988.484493037272,
+  "last_updated": "10:26"
 }
