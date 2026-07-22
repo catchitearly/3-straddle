@@ -16,12 +16,25 @@
     "NSE:NIFTY26JUL24100CE",
     "NSE:NIFTY26JUL24100PE"
   ],
-  "was_below_vwap": false,
-  "first_check_done": false,
-  "baskets_deployed": 0,
-  "entries": [],
+  "was_below_vwap": true,
+  "first_check_done": true,
+  "baskets_deployed": 1,
+  "entries": [
+    {
+      "basket_num": 1,
+      "entry_epoch": 1784693880,
+      "entry_time": "09:48",
+      "entry_price": 986.1500000000001,
+      "min_price": 986.1500000000001,
+      "trailing_stop": 990.7714285714287,
+      "exit_price": null,
+      "exit_time": null,
+      "exit_reason": null,
+      "pnl": null
+    }
+  ],
   "squared_off": false,
-  "last_price": null,
-  "last_vwap": null,
-  "last_updated": null
+  "last_price": 986.1500000000001,
+  "last_vwap": 995.9898445452552,
+  "last_updated": "09:48"
 }
