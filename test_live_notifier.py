@@ -11,6 +11,7 @@ from datetime import timedelta
 
 import config
 import live_notifier
+import src.live_engine as live_engine
 from src.ist_time import ist_datetime
 from test_synthetic import FakeClient
 
@@ -40,7 +41,7 @@ class TruncatingFakeClient(FakeClient):
 
 
 def main():
-    live_notifier.send_telegram_message = fake_send_telegram_message
+    live_engine.send_telegram_message = fake_send_telegram_message
 
     if os.path.exists(live_notifier.STATE_PATH):
         os.remove(live_notifier.STATE_PATH)

@@ -8,12 +8,28 @@ Fyers weekly option symbol convention (established in prior projects):
 Weekly expiry weekday changed from Thursday to Tuesday starting the week of
 2025-09-01 (see config.WEEKLY_EXPIRY_SWITCH_DATE) - verify against the NSE
 circular for your exact backtest window.
+
+config.MANUAL_EXPIRY_CODE, if set, overrides all of the above - see
+build_option_symbol() below. Update it yourself each week/month.
 """
 
+import re
 from datetime import datetime, timedelta
 
 import config
 from src.ist_time import IST, weekday_of
+
+_WEEKLY_CODE_RE = re.compile(r"^\d{5,6}$")           # e.g. "26804", "261004"
+_MONTHLY_CODE_RE = re.compile(r"^\d{2}[A-Z]{3}$")     # e.g. "26JUL"
+
+
+def _validate_manual_code(code):
+    if not (_WEEKLY_CODE_RE.match(code) or _MONTHLY_CODE_RE.match(code)):
+        raise ValueError(
+            f"config.MANUAL_EXPIRY_CODE={code!r} doesn't look like either a "
+            f"weekly numeric code (e.g. '26804') or a monthly letter code "
+            f"(e.g. '26JUL') - check for typos."
+        )
 
 
 def _expiry_weekday_for(date_str):
@@ -65,8 +81,22 @@ def build_option_symbol(trade_date_str, strike, opt_type):
     """
     Build the Fyers option symbol, e.g. NSE:NIFTY25916 24800CE
     opt_type must be 'CE' or 'PE'.
+
+    Returns (symbol, expiry_label). If config.MANUAL_EXPIRY_CODE is set, it's
+    used directly (accepts weekly numeric "26804" or monthly letter "26JUL"
+    format - whichever Fyers uses in the real symbol, since the code just
+    gets concatenated into the symbol string either way) and expiry_label is
+    that same code, since a monthly code can't be reversed into an exact
+    calendar date without a separate lookup. Otherwise falls back to the
+    automatic weekly calculation, and expiry_label is a real 'YYYY-MM-DD'.
     """
     assert opt_type in ("CE", "PE")
+
+    if config.MANUAL_EXPIRY_CODE:
+        code = config.MANUAL_EXPIRY_CODE
+        _validate_manual_code(code)
+        return f"NSE:NIFTY{code}{strike}{opt_type}", code
+
     expiry_date_str = get_weekly_expiry(trade_date_str)
     code = expiry_code(expiry_date_str)
     return f"NSE:NIFTY{code}{strike}{opt_type}", expiry_date_str

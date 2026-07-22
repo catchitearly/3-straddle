@@ -63,12 +63,18 @@ src/fyers_client.py           # Fyers v3 history API wrapper + local JSON cachin
 src/straddle_backtest.py      # core strategy engine (one day at a time)
 src/dashboard_generator.py    # Plotly HTML dashboard, tabs per day, lazy rendering
 run_backtest.py                # main entrypoint - loops over the date range
-live_notifier.py                # live entry/exit checker + Telegram alerts (cron-job.org triggered)
+live_notifier.py                # cloud: REST-polling entry/exit checker + Telegram (cron-job.org triggered)
+live_notifier_local.py          # local: websocket-driven entry/exit checker + Telegram (run on your own PC)
 render_pages.py                  # rebuilds BOTH index.html and live.html together before every Pages deploy
 src/telegram_notifier.py        # minimal Telegram Bot API sender
+src/live_engine.py               # SHARED entry/exit/Telegram logic used by both live_notifier.py and live_notifier_local.py
+src/fyers_ws_client.py           # Fyers websocket wrapper - builds 1-min candles from live ticks
+src/env_loader.py                # tiny .env file loader for local runs (no python-dotenv dependency)
+.env.example                     # copy to .env and fill in credentials for local runs
 src/live_dashboard.py            # renders docs/live.html from live_notifier's state
 test_synthetic.py              # smoke test with fabricated data, no API calls needed
-test_live_notifier.py           # simulates a full day of 2-min live-notifier runs
+test_live_notifier.py           # simulates a full day of 2-min cloud/REST live-notifier runs
+test_live_notifier_local.py     # simulates a full day of local websocket runs (fake clock, no real network)
 .github/workflows/backtest.yml # CI: run backtest -> deploy to Pages
 .github/workflows/live_notifier.yml  # CI: triggered by cron-job.org, runs live_notifier.py
 ```
@@ -129,12 +135,136 @@ cron-job.org (every 2 min)  --POST-->  GitHub repository_dispatch API
 
 ### Both workflows keep the Pages site in sync
 
-GitHub Pages only serves **one artifact at a time** — if `backtest.yml` and `live_notifier.yml` each only rebuilt their own page before deploying, every deploy from either one would silently wipe out the other's page. To avoid that, both workflows run `render_pages.py` right before uploading the Pages artifact:
+GitHub Pages here deploys **from a branch** (`main` / `/docs`), so if `backtest.yml` and `live_notifier.yml` each only rebuilt their own page before committing, every commit from either one would silently wipe out the other's page (since `docs/` is one shared folder). To avoid that, both workflows run `render_pages.py` right before committing:
 
 - It rebuilds `docs/index.html` (backtest tabs) from whatever's in the committed `docs/results.json`, if it exists — otherwise writes a small placeholder that links to the live page.
 - It rebuilds `docs/live.html` (today's live status: strike, current price vs VWAP, every entry/exit so far) from `data/live_state.json`, if it exists.
 
-So a live-notifier run (every 2 minutes) recommits the *whole* site with both pages current, and a manual backtest run does the same. They also share the same `docs-pages` concurrency group so overlapping deploys queue instead of racing. `docs/live.html` links back to `docs/index.html` and vice versa.
+So a live-notifier run (every 2 minutes) recommits the *whole* site with both pages current, and a manual backtest run does the same. They also share the same `docs-pages` concurrency group so overlapping commits queue instead of racing. `docs/live.html` links back to `docs/index.html` and vice versa.
+
+## Running locally on Linux Mint (recommended over the 2-minute cloud cron)
+
+`live_notifier_local.py` runs continuously on your own machine, using the **Fyers WebSocket** to build 1-minute candles from live ticks — no REST polling, no GitHub Actions, no cron-job.org. This is meaningfully better than the cloud version: the cloud path only samples every 2 minutes (missing a lot of crossings in between), while this samples every completed minute, matching the batch backtest far more closely.
+
+**Entry, exit, and Telegram logic are identical** between this and the cloud version — both funnel through `src/live_engine.py`, the single place that actually decides what to do with a bar. Only the data source differs.
+
+**Safe to start any time before market open** (e.g. 07:00) — it idles with no network connection open until 09:15 IST, then connects and starts fetching. Data is only ever fetched from market open onward.
+
+### Step-by-step: first-time setup
+
+```bash
+# 1. Unzip the project and cd into it
+cd nifty-straddle-vwap
+
+# 2. Check your Python version (3.8+ needed; Mint usually ships 3.10+ already)
+python3 --version
+
+# 3. Create a virtual environment (keeps this project's packages separate
+#    from anything else on your system - recommended on an older shared PC)
+python3 -m venv venv
+source venv/bin/activate
+
+# 4. Install dependencies
+pip install -r requirements.txt
+
+# 5. Set up your credentials (see "Fyers credentials" section below)
+cp .env.example .env
+nano .env   # or your preferred editor - fill in the 4 values
+```
+
+### Every trading morning
+
+```bash
+cd nifty-straddle-vwap
+source venv/bin/activate   # if you made a venv in step 3 above
+
+# Regenerate FYERS_ACCESS_TOKEN in .env - Fyers tokens expire daily (see below)
+
+python3 live_notifier_local.py
+```
+
+Leave that running. It prints its progress (waiting for market open, strike fixed, each entry/exit) to the terminal, and sends the same events to Telegram. It exits on its own after the 15:15 square-off.
+
+### Keeping it running without keeping a terminal window open
+
+Since this is a long-running process, not a one-off script, you want it to survive closing the terminal / logging out. Two simple options on Mint:
+
+**Option A - `tmux` (simplest)**:
+```bash
+sudo apt install tmux   # if not already installed
+tmux new -s straddle
+# inside the tmux session:
+cd nifty-straddle-vwap && source venv/bin/activate && python3 live_notifier_local.py
+# detach with: Ctrl-b then d  -- it keeps running in the background
+# reattach later with:
+tmux attach -t straddle
+```
+
+**Option B - systemd user service (auto-starts, auto-restarts on crash)**:
+```bash
+mkdir -p ~/.config/systemd/user
+cat > ~/.config/systemd/user/straddle-notifier.service << 'EOF'
+[Unit]
+Description=Nifty straddle live notifier
+
+[Service]
+WorkingDirectory=%h/nifty-straddle-vwap
+ExecStart=%h/nifty-straddle-vwap/venv/bin/python3 live_notifier_local.py
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user daemon-reload
+systemctl --user start straddle-notifier
+systemctl --user enable straddle-notifier   # optional: auto-start on login
+
+# check on it:
+systemctl --user status straddle-notifier
+journalctl --user -u straddle-notifier -f   # live log tail
+```
+Since the access token needs refreshing every morning anyway, with this option you'd `systemctl --user restart straddle-notifier` each morning after updating `.env`, rather than it truly running unattended for weeks.
+
+### If you kill it and restart the same day
+
+State is saved to `data/live_state.json` after every processed bar. If you `Ctrl-C` it or it crashes, just re-run `python3 live_notifier_local.py` — it picks up from wherever it left off (won't re-fix the strike or re-enter baskets that already fired that day) rather than starting over.
+
+### Things worth double-checking before trusting this for real trading
+
+- **Tick field names**: `src/fyers_ws_client.py`'s `_parse_tick()` tries the common `ltp`/`vol_traded_today` key names, but these have varied slightly across `fyers-apiv3` versions in different reports. The first time you run this, watch the console for `WARNING: ws tick missing symbol/ltp keys` — if you see it, print the raw tick dict once to see your installed version's actual field names and adjust `_parse_tick()`.
+- **Per-minute volume** is derived by diffing Fyers' cumulative "volume traded today" figure across each minute boundary — a missed tick right at a boundary can make that minute's volume slightly off. This only affects VWAP's volume weighting, not the price itself.
+- **Test it first without spending real API calls**: `python3 test_live_notifier_local.py` simulates a full trading day using a fake clock and the same synthetic price generator as the other tests — no real WebSocket connection, no real waiting, prints every alert that would have fired.
+
+## Where to update Fyers credentials
+
+- **Local runs** (`live_notifier_local.py`, and `run_backtest.py`/`live_notifier.py` if you run them locally): edit `.env` (copied from `.env.example`, gitignored so it's safe to put real secrets in). All four values go there: `FYERS_APP_ID`, `FYERS_ACCESS_TOKEN`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. `src/env_loader.py` loads this file automatically at the top of each script — no `export` needed.
+- **Fyers access tokens expire daily** — this is a Fyers platform limitation, not something this project can work around. You need to regenerate `FYERS_ACCESS_TOKEN` (via your usual Fyers login/auth flow) and update `.env` every trading morning before running the local script.
+- **Cloud runs** (GitHub Actions): unchanged from before — set as repo Secrets under Settings → Secrets and variables → Actions, not in `.env` (which doesn't exist in that environment).
+
+## Where to update expiry
+
+**Manual override (what you'll likely use week to week):** set `config.MANUAL_EXPIRY_CODE` to hardcode the exact expiry code used in every option symbol, in whichever format Fyers uses for that contract:
+```python
+MANUAL_EXPIRY_CODE = "26804"   # weekly numeric: YY + M(no leading zero) + DD -> 2026-08-04
+MANUAL_EXPIRY_CODE = "26JUL"   # monthly letters: YY + 3-letter month
+```
+Set it back to `MANUAL_EXPIRY_CODE = None` to return to automatic weekly calculation. This one setting is read by `build_option_symbol()` in `src/expiry_utils.py`, which every part of the project (batch backtest, cloud notifier, local websocket notifier) already funnels through — so setting it once in `config.py` updates the expiry everywhere consistently. An invalid code (typo) raises a clear error immediately rather than silently building a wrong Fyers symbol.
+
+**Automatic calculation (when `MANUAL_EXPIRY_CODE` is `None`):** the two things that affect it, both in `config.py`:
+
+- **`WEEKLY_EXPIRY_SWITCH_DATE`** — the cutover date after which weekly expiry moved from Thursday to Tuesday. Already set based on what you told me earlier, but worth confirming against the actual NSE circular for extra certainty.
+- **`NSE_HOLIDAYS`** — empty by default. If an expiry falls on a holiday you haven't listed here, the calculated expiry will be one day early (since holidays get skipped backward to the previous trading day). Worth populating this with the NSE holiday calendar for whatever period you're trading.
+
+If you ever need to sanity-check what expiry the code will use for a given date (with `MANUAL_EXPIRY_CODE` set to `None`), run this directly:
+```bash
+python3 -c "
+from src.expiry_utils import get_weekly_expiry, expiry_code
+d = '2026-07-16'   # change to whatever date you want to check
+e = get_weekly_expiry(d)
+print(d, '->', e, expiry_code(e))
+"
+```
 
 ## Testing without live API access
 

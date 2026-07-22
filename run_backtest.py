@@ -9,6 +9,9 @@ import json
 import os
 import sys
 
+from src.env_loader import load_dotenv_if_present
+load_dotenv_if_present()
+
 import config
 from src.ist_time import date_range_str, is_weekend
 from src.fyers_client import FyersHistoryClient

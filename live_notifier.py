@@ -1,24 +1,19 @@
 """
-Live notifier - meant to be triggered every ~2 minutes during market hours by
-an external cron (cron-job.org calling GitHub's repository_dispatch API,
-which fires the .github/workflows/live_notifier.yml workflow).
+Live notifier (cloud) - meant to be triggered every ~2 minutes during market
+hours by an external cron (cron-job.org calling GitHub's repository_dispatch
+API, which fires .github/workflows/live_notifier.yml).
 
-Mirrors src/straddle_backtest.py's exit logic exactly, evaluated
-incrementally instead of over a full day's data at once:
-  - First bar at/after 09:45: enter if price < VWAP (regardless of what
-    happened before 09:45).
-  - Fresh downward VWAP crossings after that -> deploy another basket.
-  - Each open basket exits independently, whichever happens first:
-      * price crosses back above VWAP ("Price > VWAP Exit"), or
-      * price rallies back up through its ATR trailing stop
-        ("Trailing Stop Hit"), or
-      * 15:15 IST time exit (whatever's still open gets closed together).
+All entry/exit/Telegram decision logic lives in src/live_engine.py - this
+file's only job is: fetch the latest data via Fyers' REST history API, build
+a single bar (price/vwap/atr), and hand it to the shared engine. That way
+this cloud runner and live_notifier_local.py (the websocket-driven version
+for running on your own machine) can never quietly drift apart in behavior.
 
 Each run:
   1. Loads today's state from data/live_state.json (resets if it's a new day).
   2. Fixes the strike (once) if it's past 09:45 and not fixed yet.
-  3. If the strike is fixed and we're not squared off yet, evaluates the
-     latest available bar for exits (on open baskets) and entries.
+  3. If the strike is fixed and we're not squared off yet, fetches the latest
+     bar and hands it to src/live_engine.py for the actual entry/exit logic.
   4. Saves state.json. The calling workflow git-commits it back to the repo
      so state survives between ephemeral runner boots.
 """
@@ -27,13 +22,15 @@ import json
 import os
 from datetime import datetime
 
+from src.env_loader import load_dotenv_if_present
+load_dotenv_if_present()
+
 import config
 from src.ist_time import IST, ist_datetime, ist_to_epoch, is_weekend
 from src.vwap import compute_cumulative_vwap
-from src.expiry_utils import round_to_nearest_strike, build_option_symbol
 from src.straddle_backtest import merge_basket_series, compute_basket_atr
 from src.fyers_client import FyersHistoryClient
-from src.telegram_notifier import send_telegram_message
+from src.live_engine import build_strike_plan, announce_strike_fixed, evaluate_bar, finalize_squareoff
 
 STATE_PATH = "data/live_state.json"
 
@@ -82,15 +79,7 @@ def fix_strike(state, date_str, client):
         return state
 
     spot_close = spot_candles[-1]["close"]
-    atm_strike = round_to_nearest_strike(spot_close)
-    strikes = sorted(atm_strike + off for off in config.STRIKE_OFFSETS)
-
-    leg_symbols = []
-    expiry_date = None
-    for strike in strikes:
-        for opt_type in ("CE", "PE"):
-            sym, expiry_date = build_option_symbol(date_str, strike, opt_type)
-            leg_symbols.append(sym)
+    atm_strike, strikes, leg_symbols, expiry_date = build_strike_plan(spot_close, date_str)
 
     state.update({
         "strike_fixed": True,
@@ -100,13 +89,7 @@ def fix_strike(state, date_str, client):
         "leg_symbols": leg_symbols,
     })
 
-    send_telegram_message(
-        f"*Straddle basket fixed* — {date_str}\n"
-        f"Spot: {spot_close:.1f} -> ATM {atm_strike}\n"
-        f"Strikes: {strikes[0]} / {strikes[1]} / {strikes[2]}\n"
-        f"Expiry: {expiry_date}\n"
-        f"Watching for entries from now..."
-    )
+    announce_strike_fixed(date_str, spot_close, atm_strike, strikes, expiry_date)
     return state
 
 
@@ -134,12 +117,7 @@ def _fetch_merged_series(state, date_str, client):
 
 
 def check_market(state, date_str, client):
-    """One incremental step of the same logic as straddle_backtest.run_day_backtest's
-    main loop, evaluated against just the latest available bar."""
-    lot_size = config.get_lot_size(date_str)
-    qty_per_leg = config.LOTS_PER_LEG_PER_BASKET * lot_size
-    atr_multiplier = config.ATR_MULTIPLIER
-
+    """Fetch the latest bar via REST and hand it to the shared engine."""
     signal_epoch = ist_to_epoch(ist_datetime(date_str, config.SIGNAL_START_TIME))
 
     merged = _fetch_merged_series(state, date_str, client)
@@ -151,123 +129,13 @@ def check_market(state, date_str, client):
     if not relevant:
         return state
 
-    bar = relevant[-1]
-    price, vwap, atr = bar["price"], bar["vwap"], bar["atr"]
-    current_epoch = bar["epoch"]
-    entry_time = datetime.fromtimestamp(current_epoch, tz=IST).strftime("%H:%M")
-
-    is_below = price < vwap
-    is_above = price > vwap
-
-    state["last_price"] = price
-    state["last_vwap"] = vwap
-    state["last_updated"] = entry_time
-
-    # --- Check exits on currently open baskets ------------------------------
-    for e in state["entries"]:
-        if e["exit_price"] is not None:
-            continue  # already closed
-
-        if price < e["min_price"]:
-            e["min_price"] = price
-            e["trailing_stop"] = e["min_price"] + (atr_multiplier * atr)
-
-        exit_reason = None
-        if is_above:
-            exit_reason = "Price > VWAP Exit"
-        elif price >= e["trailing_stop"]:
-            exit_reason = f"Trailing Stop Hit ({atr_multiplier}x ATR)"
-
-        if exit_reason:
-            pnl = (e["entry_price"] - price) * qty_per_leg
-            e["exit_price"] = price
-            e["exit_time"] = entry_time
-            e["exit_reason"] = exit_reason
-            e["pnl"] = pnl
-            send_telegram_message(
-                f"*EXIT basket #{e['basket_num']}* — {date_str} {entry_time}\n"
-                f"Reason: {exit_reason}\n"
-                f"Entry {e['entry_price']:.2f} @ {e['entry_time']} -> Exit {price:.2f}\n"
-                f"PnL: {'+' if pnl >= 0 else ''}{pnl:.2f}"
-            )
-
-    # --- Entry logic ----------------------------------------------------------
-    at_cap = (config.MAX_BASKETS_PER_DAY is not None
-              and state["baskets_deployed"] >= config.MAX_BASKETS_PER_DAY)
-    should_enter = False
-
-    if not state["first_check_done"]:
-        state["first_check_done"] = True
-        if is_below and not at_cap:
-            should_enter = True
-    elif is_below and not state["was_below_vwap"] and not at_cap:
-        should_enter = True
-
-    if should_enter:
-        state["baskets_deployed"] += 1
-        state["entries"].append({
-            "basket_num": state["baskets_deployed"],
-            "entry_epoch": current_epoch,
-            "entry_time": entry_time,
-            "entry_price": price,
-            "min_price": price,
-            "trailing_stop": price + (atr_multiplier * atr),
-            "exit_price": None,
-            "exit_time": None,
-            "exit_reason": None,
-            "pnl": None,
-        })
-        send_telegram_message(
-            f"*SELL basket #{state['baskets_deployed']}* — {date_str} {entry_time}\n"
-            f"Strikes {state['strikes'][0]}/{state['strikes'][1]}/{state['strikes'][2]} "
-            f"(expiry {state['expiry']})\n"
-            f"Combined price: {price:.2f} (VWAP {vwap:.2f})\n"
-            f"Qty per leg: {qty_per_leg} ({config.LOTS_PER_LEG_PER_BASKET} lot x {lot_size})"
-        )
-    else:
-        print(f"No new entry. price={price:.2f} vwap={vwap:.2f} below={is_below}")
-
-    state["was_below_vwap"] = is_below
-    return state
+    return evaluate_bar(state, date_str, relevant[-1])
 
 
 def square_off(state, date_str, client):
-    lot_size = config.get_lot_size(date_str)
-    qty_per_leg = config.LOTS_PER_LEG_PER_BASKET * lot_size
-
-    open_entries = [e for e in state["entries"] if e["exit_price"] is None]
-    if not open_entries:
-        print("Nothing open at square-off time.")
-        state["squared_off"] = True
-        return state
-
     merged = _fetch_merged_series(state, date_str, client)
     exit_price = merged[-1]["price"] if merged else None
-    exit_time = config.SQUARE_OFF_TIME
-
-    if exit_price is None:
-        print("Could not fetch an exit price this run - will retry next run.")
-        return state  # don't mark squared_off, retry next run
-
-    day_pnl = 0.0
-    lines = [f"*SQUARE OFF* — {date_str} {exit_time}"]
-    for e in open_entries:
-        pnl = (e["entry_price"] - exit_price) * qty_per_leg
-        e["exit_price"] = exit_price
-        e["exit_time"] = exit_time
-        e["exit_reason"] = "15:15 Time Exit"
-        e["pnl"] = pnl
-        day_pnl += pnl
-        lines.append(f"#{e['basket_num']}: entry {e['entry_price']:.2f} @ {e['entry_time']} "
-                     f"-> exit {exit_price:.2f} = {'+' if pnl >= 0 else ''}{pnl:.2f}")
-
-    total_day_pnl = sum(e["pnl"] for e in state["entries"] if e["pnl"] is not None)
-    lines.append(f"\n*Day total: {'+' if total_day_pnl >= 0 else ''}{total_day_pnl:.2f}* "
-                 f"across {state['baskets_deployed']} basket(s)")
-    send_telegram_message("\n".join(lines))
-
-    state["squared_off"] = True
-    return state
+    return finalize_squareoff(state, date_str, exit_price)
 
 
 def main(now_override=None, client_override=None):

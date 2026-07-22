@@ -29,7 +29,7 @@ LOTS_PER_LEG_PER_BASKET = 1                 # 1 lot on each of the 6 legs per ba
 # Every fresh downward cross of combined-price below combined-VWAP (after
 # 09:45) sells one full basket again - exposure compounds. Set an int here to
 # cap the number of baskets sold per day; leave as None for unlimited.
-MAX_BASKETS_PER_DAY = 3 #None
+MAX_BASKETS_PER_DAY = None
 
 # ATR trailing-stop exit (added alongside the VWAP-cross exit and 15:15 time
 # exit). ATR here is computed on the combined basket price series itself
@@ -66,6 +66,20 @@ EXPIRY_WEEKDAY_AFTER_SWITCH = 1              # Tuesday
 NSE_HOLIDAYS = set([
     # "2025-08-15",
 ])
+
+# Manual expiry override - set this to hardcode the expiry used for every
+# option symbol built this week, instead of relying on the automatic weekly
+# calculation above. Update it yourself each week/month as needed.
+#
+# Accepts either format, exactly as it appears in a real Fyers symbol:
+#   - Weekly numeric:  "26804"  (YY + M no-leading-zero + DD  ->  2026-08-04)
+#   - Monthly letters: "26JUL"  (YY + 3-letter month, e.g. 2026 July monthly)
+#
+# Set to None to go back to automatic weekly calculation (get_weekly_expiry
+# in src/expiry_utils.py).
+MANUAL_EXPIRY_CODE = None
+# MANUAL_EXPIRY_CODE = "26804"
+# MANUAL_EXPIRY_CODE = "26JUL"
 
 # ---------------------------------------------------------------------------
 # Backtest date range
