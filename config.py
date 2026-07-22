@@ -77,7 +77,7 @@ NSE_HOLIDAYS = set([
 #
 # Set to None to go back to automatic weekly calculation (get_weekly_expiry
 # in src/expiry_utils.py).
-MANUAL_EXPIRY_CODE = None
+MANUAL_EXPIRY_CODE = "26JUL" #None
 # MANUAL_EXPIRY_CODE = "26804"
 # MANUAL_EXPIRY_CODE = "26JUL"
 
@@ -85,7 +85,7 @@ MANUAL_EXPIRY_CODE = None
 # Backtest date range
 # ---------------------------------------------------------------------------
 BACKTEST_START_DATE = "2026-07-14"          # YYYY-MM-DD, override via env/CLI
-BACKTEST_END_DATE = "2026-07-20"
+BACKTEST_END_DATE = "2026-07-21"
 
 # ---------------------------------------------------------------------------
 # Fyers API
