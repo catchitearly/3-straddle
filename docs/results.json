@@ -5675,120 +5675,10 @@
         "exit_time": "10:17",
         "exit_reason": "Trailing Stop Hit (2.0x ATR)",
         "pnl": -503.75
-      },
-      {
-        "basket_num": 4,
-        "entry_epoch": 1784004600,
-        "entry_time": "10:20",
-        "entry_price": 1520.4,
-        "exit_price": 1522.6,
-        "exit_time": "10:21",
-        "exit_reason": "Price > VWAP Exit",
-        "pnl": -142.99999999998818
-      },
-      {
-        "basket_num": 5,
-        "entry_epoch": 1784004900,
-        "entry_time": "10:25",
-        "entry_price": 1521.8000000000002,
-        "exit_price": 1524.75,
-        "exit_time": "10:26",
-        "exit_reason": "Price > VWAP Exit",
-        "pnl": -191.74999999998818
-      },
-      {
-        "basket_num": 6,
-        "entry_epoch": 1784005080,
-        "entry_time": "10:28",
-        "entry_price": 1518.75,
-        "exit_price": 1518.25,
-        "exit_time": "10:34",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": 32.5
-      },
-      {
-        "basket_num": 7,
-        "entry_epoch": 1784005560,
-        "entry_time": "10:36",
-        "entry_price": 1518.9,
-        "exit_price": 1497.75,
-        "exit_time": "11:11",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": 1374.750000000006
-      },
-      {
-        "basket_num": 8,
-        "entry_epoch": 1784016600,
-        "entry_time": "13:40",
-        "entry_price": 1500.7,
-        "exit_price": 1512.1499999999999,
-        "exit_time": "13:41",
-        "exit_reason": "Price > VWAP Exit",
-        "pnl": -744.2499999999882
-      },
-      {
-        "basket_num": 9,
-        "entry_epoch": 1784016720,
-        "entry_time": "13:42",
-        "entry_price": 1509.3000000000002,
-        "exit_price": 1501.9,
-        "exit_time": "13:48",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": 481.0000000000059
-      },
-      {
-        "basket_num": 10,
-        "entry_epoch": 1784018400,
-        "entry_time": "14:10",
-        "entry_price": 1508.95,
-        "exit_price": 1511.55,
-        "exit_time": "14:21",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": -168.9999999999941
-      },
-      {
-        "basket_num": 11,
-        "entry_epoch": 1784019840,
-        "entry_time": "14:34",
-        "entry_price": 1508.2500000000002,
-        "exit_price": 1516.6999999999998,
-        "exit_time": "14:36",
-        "exit_reason": "Price > VWAP Exit",
-        "pnl": -549.2499999999734
-      },
-      {
-        "basket_num": 12,
-        "entry_epoch": 1784020200,
-        "entry_time": "14:40",
-        "entry_price": 1509.6,
-        "exit_price": 1515.05,
-        "exit_time": "14:46",
-        "exit_reason": "Price > VWAP Exit",
-        "pnl": -354.25000000000296
-      },
-      {
-        "basket_num": 13,
-        "entry_epoch": 1784021100,
-        "entry_time": "14:55",
-        "entry_price": 1501.25,
-        "exit_price": 1510.2,
-        "exit_time": "14:59",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": -581.750000000003
-      },
-      {
-        "basket_num": 14,
-        "entry_epoch": 1784021520,
-        "entry_time": "15:02",
-        "entry_price": 1504.1000000000001,
-        "exit_price": 1499.1999999999998,
-        "exit_time": "15:13",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": 318.5000000000207
       }
     ],
-    "day_pnl": -1602.249999999932,
-    "num_baskets_deployed": 14
+    "day_pnl": -1075.7500000000266,
+    "num_baskets_deployed": 3
   },
   {
     "date": "2026-07-15",
@@ -11466,40 +11356,10 @@
         "exit_time": "14:16",
         "exit_reason": "Price > VWAP Exit",
         "pnl": -256.75000000000296
-      },
-      {
-        "basket_num": 4,
-        "entry_epoch": 1784106240,
-        "entry_time": "14:34",
-        "entry_price": 1412.25,
-        "exit_price": 1414.1999999999998,
-        "exit_time": "14:35",
-        "exit_reason": "Price > VWAP Exit",
-        "pnl": -126.74999999998818
-      },
-      {
-        "basket_num": 5,
-        "entry_epoch": 1784106480,
-        "entry_time": "14:38",
-        "entry_price": 1393.95,
-        "exit_price": 1407.7,
-        "exit_time": "14:45",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": -893.75
-      },
-      {
-        "basket_num": 6,
-        "entry_epoch": 1784108160,
-        "entry_time": "15:06",
-        "entry_price": 1410.0,
-        "exit_price": 1406.75,
-        "exit_time": "15:15",
-        "exit_reason": "15:15 Time Exit",
-        "pnl": 211.25
       }
     ],
-    "day_pnl": -2014.9999999999854,
-    "num_baskets_deployed": 6
+    "day_pnl": -1205.749999999997,
+    "num_baskets_deployed": 3
   },
   {
     "date": "2026-07-16",
@@ -17177,40 +17037,10 @@
         "exit_time": "11:32",
         "exit_reason": "Trailing Stop Hit (2.0x ATR)",
         "pnl": 711.750000000003
-      },
-      {
-        "basket_num": 4,
-        "entry_epoch": 1784188920,
-        "entry_time": "13:32",
-        "entry_price": 1296.9500000000003,
-        "exit_price": 1304.4,
-        "exit_time": "13:38",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": -484.2499999999882
-      },
-      {
-        "basket_num": 5,
-        "entry_epoch": 1784189520,
-        "entry_time": "13:42",
-        "entry_price": 1302.1999999999998,
-        "exit_price": 1307.8500000000001,
-        "exit_time": "13:44",
-        "exit_reason": "Price > VWAP Exit",
-        "pnl": -367.2500000000207
-      },
-      {
-        "basket_num": 6,
-        "entry_epoch": 1784189700,
-        "entry_time": "13:45",
-        "entry_price": 1304.05,
-        "exit_price": 1291.85,
-        "exit_time": "13:53",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": 793.000000000003
       }
     ],
-    "day_pnl": 845.0,
-    "num_baskets_deployed": 6
+    "day_pnl": 903.5000000000059,
+    "num_baskets_deployed": 3
   },
   {
     "date": "2026-07-17",
@@ -22888,20 +22718,10 @@
         "exit_time": "13:28",
         "exit_reason": "Price > VWAP Exit",
         "pnl": -152.75000000000887
-      },
-      {
-        "basket_num": 4,
-        "entry_epoch": 1784275620,
-        "entry_time": "13:37",
-        "entry_price": 1316.9,
-        "exit_price": 1279.9,
-        "exit_time": "13:59",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": 2405.0
       }
     ],
-    "day_pnl": 1901.2499999999852,
-    "num_baskets_deployed": 4
+    "day_pnl": -503.7500000000148,
+    "num_baskets_deployed": 3
   },
   {
     "date": "2026-07-20",
@@ -34240,19 +34060,9 @@
         "exit_time": "13:03",
         "exit_reason": "Price > VWAP Exit",
         "pnl": -45.500000000002956
-      },
-      {
-        "basket_num": 4,
-        "entry_epoch": 1784619240,
-        "entry_time": "13:04",
-        "entry_price": 1012.2,
-        "exit_price": 1006.8,
-        "exit_time": "13:13",
-        "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-        "pnl": 351.0000000000059
       }
     ],
-    "day_pnl": 766.9999999999823,
-    "num_baskets_deployed": 4
+    "day_pnl": 415.99999999997635,
+    "num_baskets_deployed": 3
   }
 ]
