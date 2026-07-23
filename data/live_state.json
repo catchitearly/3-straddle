@@ -16,12 +16,25 @@
     "NSE:NIFTY26JUL24000CE",
     "NSE:NIFTY26JUL24000PE"
   ],
-  "was_below_vwap": false,
-  "first_check_done": false,
-  "baskets_deployed": 0,
-  "entries": [],
+  "was_below_vwap": true,
+  "first_check_done": true,
+  "baskets_deployed": 1,
+  "entries": [
+    {
+      "basket_num": 1,
+      "entry_epoch": 1784780280,
+      "entry_time": "09:48",
+      "entry_price": 838.9999999999999,
+      "min_price": 838.9999999999999,
+      "trailing_stop": 843.3714285714284,
+      "exit_price": null,
+      "exit_time": null,
+      "exit_reason": null,
+      "pnl": null
+    }
+  ],
   "squared_off": false,
-  "last_price": null,
-  "last_vwap": null,
-  "last_updated": null
+  "last_price": 838.9999999999999,
+  "last_vwap": 860.9864850700893,
+  "last_updated": "09:48"
 }
