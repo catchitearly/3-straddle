@@ -16,7 +16,7 @@
     "NSE:NIFTY26JUL24000CE",
     "NSE:NIFTY26JUL24000PE"
   ],
-  "was_below_vwap": true,
+  "was_below_vwap": false,
   "first_check_done": true,
   "baskets_deployed": 2,
   "entries": [
@@ -39,14 +39,14 @@
       "entry_price": 830.95,
       "min_price": 830.95,
       "trailing_stop": 840.657142857143,
-      "exit_price": null,
-      "exit_time": null,
-      "exit_reason": null,
-      "pnl": null
+      "exit_price": 843.2,
+      "exit_time": "12:50",
+      "exit_reason": "Price > VWAP Exit",
+      "pnl": -796.25
     }
   ],
   "squared_off": false,
-  "last_price": 830.95,
-  "last_vwap": 837.6016105096153,
-  "last_updated": "12:48"
+  "last_price": 843.2,
+  "last_vwap": 837.6690330013253,
+  "last_updated": "12:50"
 }
