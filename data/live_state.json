@@ -1,64 +1,16 @@
 {
-  "date": "2026-07-22",
-  "strike_fixed": true,
-  "atm_strike": 24000,
-  "strikes": [
-    23900,
-    24000,
-    24100
-  ],
-  "expiry": "26JUL",
-  "leg_symbols": [
-    "NSE:NIFTY26JUL23900CE",
-    "NSE:NIFTY26JUL23900PE",
-    "NSE:NIFTY26JUL24000CE",
-    "NSE:NIFTY26JUL24000PE",
-    "NSE:NIFTY26JUL24100CE",
-    "NSE:NIFTY26JUL24100PE"
-  ],
-  "was_below_vwap": true,
-  "first_check_done": true,
-  "baskets_deployed": 3,
-  "entries": [
-    {
-      "basket_num": 1,
-      "entry_epoch": 1784693880,
-      "entry_time": "09:48",
-      "entry_price": 986.1500000000001,
-      "min_price": 964.3,
-      "trailing_stop": 968.0142857142857,
-      "exit_price": 971.65,
-      "exit_time": "10:24",
-      "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-      "pnl": 942.5000000000074
-    },
-    {
-      "basket_num": 2,
-      "entry_epoch": 1784696280,
-      "entry_time": "10:28",
-      "entry_price": 982.05,
-      "min_price": 964.2,
-      "trailing_stop": 968.1928571428572,
-      "exit_price": 969.4499999999999,
-      "exit_time": "11:06",
-      "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-      "pnl": 819.0000000000015
-    },
-    {
-      "basket_num": 3,
-      "entry_epoch": 1784703240,
-      "entry_time": "12:24",
-      "entry_price": 969.0,
-      "min_price": 969.0,
-      "trailing_stop": 975.3642857142856,
-      "exit_price": 977.45,
-      "exit_time": "12:28",
-      "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-      "pnl": -549.250000000003
-    }
-  ],
-  "squared_off": true,
-  "last_price": 940.3000000000001,
-  "last_vwap": 974.680486692379,
-  "last_updated": "15:14"
+  "date": "2026-07-23",
+  "strike_fixed": false,
+  "atm_strike": null,
+  "strikes": null,
+  "expiry": null,
+  "leg_symbols": null,
+  "was_below_vwap": false,
+  "first_check_done": false,
+  "baskets_deployed": 0,
+  "entries": [],
+  "squared_off": false,
+  "last_price": null,
+  "last_vwap": null,
+  "last_updated": null
 }
