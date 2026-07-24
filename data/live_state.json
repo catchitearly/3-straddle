@@ -16,7 +16,7 @@
     "NSE:NIFTY26JUL23800CE",
     "NSE:NIFTY26JUL23800PE"
   ],
-  "was_below_vwap": true,
+  "was_below_vwap": false,
   "first_check_done": true,
   "baskets_deployed": 3,
   "entries": [
@@ -58,7 +58,7 @@
     }
   ],
   "squared_off": false,
-  "last_price": 800.2,
-  "last_vwap": 805.5243296278974,
-  "last_updated": "13:16"
+  "last_price": 813.2999999999998,
+  "last_vwap": 805.5821297368714,
+  "last_updated": "13:18"
 }
