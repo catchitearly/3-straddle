@@ -17,11 +17,11 @@
     "NSE:NIFTY26JUL23800PE"
   ],
   "was_below_vwap": false,
-  "first_check_done": false,
+  "first_check_done": true,
   "baskets_deployed": 0,
   "entries": [],
   "squared_off": false,
-  "last_price": null,
-  "last_vwap": null,
-  "last_updated": null
+  "last_price": 808.95,
+  "last_vwap": 799.3127000574212,
+  "last_updated": "09:48"
 }
