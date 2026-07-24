@@ -1,10 +1,21 @@
 {
   "date": "2026-07-24",
-  "strike_fixed": false,
-  "atm_strike": null,
-  "strikes": null,
-  "expiry": null,
-  "leg_symbols": null,
+  "strike_fixed": true,
+  "atm_strike": 23700,
+  "strikes": [
+    23600,
+    23700,
+    23800
+  ],
+  "expiry": "26JUL",
+  "leg_symbols": [
+    "NSE:NIFTY26JUL23600CE",
+    "NSE:NIFTY26JUL23600PE",
+    "NSE:NIFTY26JUL23700CE",
+    "NSE:NIFTY26JUL23700PE",
+    "NSE:NIFTY26JUL23800CE",
+    "NSE:NIFTY26JUL23800PE"
+  ],
   "was_below_vwap": false,
   "first_check_done": false,
   "baskets_deployed": 0,
