@@ -16,9 +16,9 @@
     "NSE:NIFTY26JUL24100CE",
     "NSE:NIFTY26JUL24100PE"
   ],
-  "was_below_vwap": false,
+  "was_below_vwap": true,
   "first_check_done": true,
-  "baskets_deployed": 1,
+  "baskets_deployed": 2,
   "entries": [
     {
       "basket_num": 1,
@@ -31,10 +31,22 @@
       "exit_time": "09:54",
       "exit_reason": "Trailing Stop Hit (2.0x ATR)",
       "pnl": -419.24999999999926
+    },
+    {
+      "basket_num": 2,
+      "entry_epoch": 1785128460,
+      "entry_time": "10:31",
+      "entry_price": 511.0,
+      "min_price": 511.0,
+      "trailing_stop": 519.6142857142858,
+      "exit_price": null,
+      "exit_time": null,
+      "exit_reason": null,
+      "pnl": null
     }
   ],
   "squared_off": false,
-  "last_price": 527.15,
-  "last_vwap": 525.8321054456371,
-  "last_updated": "10:28"
+  "last_price": 511.0,
+  "last_vwap": 525.6960638783823,
+  "last_updated": "10:31"
 }
