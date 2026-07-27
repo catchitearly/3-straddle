@@ -27,14 +27,14 @@
       "entry_price": 511.34999999999997,
       "min_price": 509.05,
       "trailing_stop": 512.0214285714286,
-      "exit_price": null,
-      "exit_time": null,
-      "exit_reason": null,
-      "pnl": null
+      "exit_price": 517.8,
+      "exit_time": "09:54",
+      "exit_reason": "Trailing Stop Hit (2.0x ATR)",
+      "pnl": -419.24999999999926
     }
   ],
   "squared_off": false,
-  "last_price": 509.75,
-  "last_vwap": 531.6554823500186,
-  "last_updated": "09:52"
+  "last_price": 517.8,
+  "last_vwap": 530.7617182049199,
+  "last_updated": "09:54"
 }
