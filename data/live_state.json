@@ -37,8 +37,8 @@
       "entry_epoch": 1785213720,
       "entry_time": "10:12",
       "entry_price": 320.55,
-      "min_price": 306.25,
-      "trailing_stop": 308.64285714285717,
+      "min_price": 303.2,
+      "trailing_stop": 305.0857142857143,
       "exit_price": null,
       "exit_time": null,
       "exit_reason": null,
@@ -46,7 +46,7 @@
     }
   ],
   "squared_off": false,
-  "last_price": 306.25,
-  "last_vwap": 326.225818051296,
-  "last_updated": "10:28"
+  "last_price": 303.2,
+  "last_vwap": 325.7745577144614,
+  "last_updated": "10:31"
 }
