@@ -77,7 +77,7 @@ NSE_HOLIDAYS = set([
 #
 # Set to None to go back to automatic weekly calculation (get_weekly_expiry
 # in src/expiry_utils.py).
-MANUAL_EXPIRY_CODE = "26JUL" #None
+MANUAL_EXPIRY_CODE = "26804" #None
 # MANUAL_EXPIRY_CODE = "26804"
 # MANUAL_EXPIRY_CODE = "26JUL"
 
