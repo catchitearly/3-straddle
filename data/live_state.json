@@ -16,7 +16,7 @@
     "NSE:NIFTY2680424300CE",
     "NSE:NIFTY2680424300PE"
   ],
-  "was_below_vwap": false,
+  "was_below_vwap": true,
   "first_check_done": true,
   "baskets_deployed": 3,
   "entries": [
@@ -58,7 +58,7 @@
     }
   ],
   "squared_off": false,
-  "last_price": 748.5000000000001,
-  "last_vwap": 734.7312267965207,
-  "last_updated": "15:08"
+  "last_price": 733.1500000000001,
+  "last_vwap": 734.7196123806559,
+  "last_updated": "15:10"
 }
