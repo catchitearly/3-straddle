@@ -53,12 +53,30 @@ td.open-badge { color: var(--accent); font-weight: 600; }
 <div class="nav"><a href="index.html">&larr; Full backtest dashboard</a></div>
 
     <h1>Live Straddle Basket Status
-      <span class="status-pill live">AWAITING STRIKE FIX</span>
+      <span class="status-pill live">LIVE</span>
     </h1>
     <div class="subtitle">2026-07-30 &middot; auto-refreshes every 2 minutes while the notifier is running</div>
     
-        <div class="chart-box no-data">
-          Strike not fixed yet for 2026-07-30 — waiting for 09:45 IST.
+        <div class="summary">
+          <div class="stat"><div class="label">Realized PnL</div>
+            <div class="value pos">&#8377;+0</div></div>
+          <div class="stat"><div class="label">Baskets Deployed</div><div class="value">0</div></div>
+          <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
+          <div class="stat"><div class="label">Closed</div><div class="value">0</div></div>
+        </div>
+        <div class="chart-box">
+          <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
+            Strikes: <b style="color:var(--text)">24200 / 24300 / 24400</b>
+            &nbsp;&middot;&nbsp; Expiry: <b style="color:var(--text)">26804</b>
+            &nbsp;&middot;&nbsp; Last update: <b style="color:var(--text)">-</b> IST
+          </div>
+          <div style="font-size:14px;">Waiting for first price update...</div>
+        </div>
+        <div class="chart-box">
+          <table>
+            <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
+            <tbody><tr><td colspan="7" class="no-data">No entries yet today</td></tr></tbody>
+          </table>
         </div>
 </body>
 </html>
