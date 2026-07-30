@@ -16,12 +16,25 @@
     "NSE:NIFTY2680424400CE",
     "NSE:NIFTY2680424400PE"
   ],
-  "was_below_vwap": false,
-  "first_check_done": false,
-  "baskets_deployed": 0,
-  "entries": [],
+  "was_below_vwap": true,
+  "first_check_done": true,
+  "baskets_deployed": 1,
+  "entries": [
+    {
+      "basket_num": 1,
+      "entry_epoch": 1785385080,
+      "entry_time": "09:48",
+      "entry_price": 728.55,
+      "min_price": 728.55,
+      "trailing_stop": 731.9785714285714,
+      "exit_price": null,
+      "exit_time": null,
+      "exit_reason": null,
+      "pnl": null
+    }
+  ],
   "squared_off": false,
-  "last_price": null,
-  "last_vwap": null,
-  "last_updated": null
+  "last_price": 728.55,
+  "last_vwap": 742.6838647985169,
+  "last_updated": "09:48"
 }
