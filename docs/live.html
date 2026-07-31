@@ -53,56 +53,12 @@ td.open-badge { color: var(--accent); font-weight: 600; }
 <div class="nav" style="color: var(--muted);">Backtest dashboard not generated yet</div>
 
     <h1>Live Straddle Basket Status
-      <span class="status-pill done">SQUARED OFF</span>
+      <span class="status-pill live">AWAITING STRIKE FIX</span>
     </h1>
-    <div class="subtitle">2026-07-30 &middot; auto-refreshes every 2 minutes while the notifier is running</div>
+    <div class="subtitle">2026-07-31 &middot; auto-refreshes every 2 minutes while the notifier is running</div>
     
-        <div class="summary">
-          <div class="stat"><div class="label">Realized PnL</div>
-            <div class="value pos">&#8377;+1368</div></div>
-          <div class="stat"><div class="label">Baskets Deployed</div><div class="value">3</div></div>
-          <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
-          <div class="stat"><div class="label">Closed</div><div class="value">3</div></div>
-        </div>
-        <div class="chart-box">
-          <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-            Strikes: <b style="color:var(--text)">24100 / 24200 / 24300</b>
-            &nbsp;&middot;&nbsp; Expiry: <b style="color:var(--text)">26804</b>
-            &nbsp;&middot;&nbsp; Last update: <b style="color:var(--text)">15:14</b> IST
-          </div>
-          <div style="font-size:14px;">Combined price: <b>734.70</b> vs VWAP <b>734.75</b></div>
-        </div>
-        <div class="chart-box">
-          <table>
-            <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
-            <tbody><tr>
-                <td>#1</td>
-                <td>10:18</td>
-                <td>726.95</td>
-                <td>10:32</td>
-                <td>721.40</td>
-                <td>Trailing Stop Hit (2.0x ATR)</td>
-                <td class="pnl-pos">+360.75</td>
-            </tr>
-<tr>
-                <td>#2</td>
-                <td>13:01</td>
-                <td>740.90</td>
-                <td>13:02</td>
-                <td>745.10</td>
-                <td>Price > VWAP Exit</td>
-                <td class="pnl-neg">-273.00</td>
-            </tr>
-<tr>
-                <td>#3</td>
-                <td>13:06</td>
-                <td>742.20</td>
-                <td>13:22</td>
-                <td>722.50</td>
-                <td>Trailing Stop Hit (2.0x ATR)</td>
-                <td class="pnl-pos">+1280.50</td>
-            </tr></tbody>
-          </table>
+        <div class="chart-box no-data">
+          Strike not fixed yet for 2026-07-31 — waiting for 09:45 IST.
         </div>
 </body>
 </html>
