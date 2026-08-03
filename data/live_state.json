@@ -33,7 +33,7 @@
       "pnl": -84.50000000000074
     }
   ],
-  "squared_off": false,
+  "squared_off": true,
   "last_price": 419.04999999999995,
   "last_vwap": 430.16728403725216,
   "last_updated": "15:14"
