@@ -28,9 +28,6 @@ concurrency:
 jobs:
   backtest:
     runs-on: ubuntu-latest
-    # Force the runner's TZ to IST too, belt-and-suspenders on top of the
-    # explicit +05:30 handling in src/ist_time.py (that bug bit us before -
-    # never trust the runner's local time).
     env:
       TZ: Asia/Kolkata
       FYERS_APP_ID: ${{ secrets.FYERS_APP_ID }}
