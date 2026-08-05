@@ -70,28 +70,36 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       <div class="summary">
         <div class="stat"><div class="label">Realized PnL</div>
           <div class="value pos">&#8377;+0</div></div>
-        <div class="stat"><div class="label">Baskets Deployed</div><div class="value">0</div></div>
-        <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Baskets Deployed</div><div class="value">1</div></div>
+        <div class="stat"><div class="label">Open</div><div class="value">1</div></div>
         <div class="stat"><div class="label">Closed</div><div class="value">0</div></div>
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">10:00:00</b> IST
+          Last update: <b style="color:var(--text)">10:02:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>862.15</b> vs VWAP <b>855.66</b></div>
+        <div style="font-size:14px;">Combined price: <b>854.50</b> vs VWAP <b>855.77</b></div>
       </div>
       <div class="chart-box"><div id="chart-A" style="height:320px;"></div></div>
       <div class="chart-box">
         <table>
           <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
-          <tbody><tr><td colspan="7" class="no-data">No entries yet today</td></tr></tbody>
+          <tbody><tr>
+            <td>#1</td>
+            <td>10:02:00</td>
+            <td>854.50</td>
+            <td>-</td>
+            <td>-</td>
+            <td><span class="open-badge">OPEN</span></td>
+            <td class="pnl-pos">-</td>
+        </tr></tbody>
         </table>
       </div>
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 865.05, "vwap": 852.55}, {"time": "09:50:00", "price": 864.05, "vwap": 852.81}, {"time": "09:52:00", "price": 863.3, "vwap": 853.34}, {"time": "09:54:00", "price": 861.95, "vwap": 853.71}, {"time": "09:56:00", "price": 868.25, "vwap": 854.8}, {"time": "09:58:00", "price": 867.25, "vwap": 855.23}, {"time": "10:00:00", "price": 862.15, "vwap": 855.66}];
-      const entries = [];
+      const series = [{"time": "09:48:00", "price": 865.05, "vwap": 852.55}, {"time": "09:50:00", "price": 864.05, "vwap": 852.81}, {"time": "09:52:00", "price": 863.3, "vwap": 853.34}, {"time": "09:54:00", "price": 861.95, "vwap": 853.71}, {"time": "09:56:00", "price": 868.25, "vwap": 854.8}, {"time": "09:58:00", "price": 867.25, "vwap": 855.23}, {"time": "10:00:00", "price": 862.15, "vwap": 855.66}, {"time": "10:02:00", "price": 854.5, "vwap": 855.77}];
+      const entries = [{"basket_num": 1, "entry_epoch": 1785904320, "entry_time": "10:02:00", "entry_price": 854.5, "min_price": 854.5, "trailing_stop": 858.5357142857142, "exit_price": null, "exit_time": null, "exit_reason": null, "pnl": null}];
       if (series.length === 0) return;
 
       const times = series.map(b => b.time);
@@ -146,9 +154,9 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">10:00:00</b> IST
+          Last update: <b style="color:var(--text)">10:02:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>938.90</b> vs VWAP <b>939.34</b></div>
+        <div style="font-size:14px;">Combined price: <b>927.75</b> vs VWAP <b>939.17</b></div>
       </div>
       <div class="chart-box"><div id="chart-B" style="height:320px;"></div></div>
       <div class="chart-box">
@@ -168,7 +176,7 @@ td.open-badge { color: var(--accent); font-weight: 600; }
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 951.55, "vwap": 940.61}, {"time": "09:50:00", "price": 949.4, "vwap": 940.85}, {"time": "09:52:00", "price": 936.8, "vwap": 940.81}, {"time": "09:54:00", "price": 935.35, "vwap": 940.63}, {"time": "09:56:00", "price": 930.25, "vwap": 939.67}, {"time": "09:58:00", "price": 932.8, "vwap": 939.47}, {"time": "10:00:00", "price": 938.9, "vwap": 939.34}];
+      const series = [{"time": "09:48:00", "price": 951.55, "vwap": 940.61}, {"time": "09:50:00", "price": 949.4, "vwap": 940.85}, {"time": "09:52:00", "price": 936.8, "vwap": 940.81}, {"time": "09:54:00", "price": 935.35, "vwap": 940.63}, {"time": "09:56:00", "price": 930.25, "vwap": 939.67}, {"time": "09:58:00", "price": 932.8, "vwap": 939.47}, {"time": "10:00:00", "price": 938.9, "vwap": 939.34}, {"time": "10:02:00", "price": 927.75, "vwap": 939.17}];
       const entries = [{"basket_num": 1, "entry_epoch": 1785903720, "entry_time": "09:52:00", "entry_price": 936.8000000000001, "min_price": 930.2499999999999, "trailing_stop": 934.5142857142856, "exit_price": 938.9000000000001, "exit_time": "10:00:00", "exit_reason": "Trailing Stop Hit (2.0x ATR)", "pnl": -136.50000000000148}];
       if (series.length === 0) return;
 
@@ -224,9 +232,9 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">10:00:00</b> IST
+          Last update: <b style="color:var(--text)">10:02:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>854.50</b> vs VWAP <b>839.82</b></div>
+        <div style="font-size:14px;">Combined price: <b>848.65</b> vs VWAP <b>840.14</b></div>
       </div>
       <div class="chart-box"><div id="chart-C" style="height:320px;"></div></div>
       <div class="chart-box">
@@ -238,7 +246,7 @@ td.open-badge { color: var(--accent); font-weight: 600; }
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 843.85, "vwap": 832.95}, {"time": "09:50:00", "price": 844.2, "vwap": 833.2}, {"time": "09:52:00", "price": 857.15, "vwap": 834.25}, {"time": "09:54:00", "price": 856.7, "vwap": 835.05}, {"time": "09:56:00", "price": 871.55, "vwap": 837.87}, {"time": "09:58:00", "price": 871.05, "vwap": 838.89}, {"time": "10:00:00", "price": 854.5, "vwap": 839.82}];
+      const series = [{"time": "09:48:00", "price": 843.85, "vwap": 832.95}, {"time": "09:50:00", "price": 844.2, "vwap": 833.2}, {"time": "09:52:00", "price": 857.15, "vwap": 834.25}, {"time": "09:54:00", "price": 856.7, "vwap": 835.05}, {"time": "09:56:00", "price": 871.55, "vwap": 837.87}, {"time": "09:58:00", "price": 871.05, "vwap": 838.89}, {"time": "10:00:00", "price": 854.5, "vwap": 839.82}, {"time": "10:02:00", "price": 848.65, "vwap": 840.14}];
       const entries = [];
       if (series.length === 0) return;
 
