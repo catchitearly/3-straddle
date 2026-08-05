@@ -41,17 +41,22 @@
       ],
       "was_below_vwap": false,
       "first_check_done": true,
-      "last_evaluated_epoch": 1785903480,
+      "last_evaluated_epoch": 1785903600,
       "baskets_deployed": 0,
       "entries": [],
-      "last_price": 865.05,
-      "last_vwap": 852.5543896166689,
-      "last_updated": "09:48:00",
+      "last_price": 864.05,
+      "last_vwap": 852.8146714387877,
+      "last_updated": "09:50:00",
       "series": [
         {
           "time": "09:48:00",
           "price": 865.05,
           "vwap": 852.55
+        },
+        {
+          "time": "09:50:00",
+          "price": 864.05,
+          "vwap": 852.81
         }
       ],
       "squared_off": false
@@ -72,17 +77,22 @@
       ],
       "was_below_vwap": false,
       "first_check_done": true,
-      "last_evaluated_epoch": 1785903480,
+      "last_evaluated_epoch": 1785903600,
       "baskets_deployed": 0,
       "entries": [],
-      "last_price": 951.5500000000001,
-      "last_vwap": 940.6125234547628,
-      "last_updated": "09:48:00",
+      "last_price": 949.4,
+      "last_vwap": 940.8508322874592,
+      "last_updated": "09:50:00",
       "series": [
         {
           "time": "09:48:00",
           "price": 951.55,
           "vwap": 940.61
+        },
+        {
+          "time": "09:50:00",
+          "price": 949.4,
+          "vwap": 940.85
         }
       ],
       "squared_off": false
@@ -103,17 +113,22 @@
       ],
       "was_below_vwap": false,
       "first_check_done": true,
-      "last_evaluated_epoch": 1785903480,
+      "last_evaluated_epoch": 1785903600,
       "baskets_deployed": 0,
       "entries": [],
-      "last_price": 843.85,
-      "last_vwap": 832.9481906705284,
-      "last_updated": "09:48:00",
+      "last_price": 844.2,
+      "last_vwap": 833.1950017251489,
+      "last_updated": "09:50:00",
       "series": [
         {
           "time": "09:48:00",
           "price": 843.85,
           "vwap": 832.95
+        },
+        {
+          "time": "09:50:00",
+          "price": 844.2,
+          "vwap": 833.2
         }
       ],
       "squared_off": false
