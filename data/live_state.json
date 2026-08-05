@@ -99,10 +99,10 @@
           "entry_price": 884.35,
           "min_price": 868.8000000000001,
           "trailing_stop": 879.8000000000001,
-          "exit_price": null,
-          "exit_time": null,
-          "exit_reason": null,
-          "pnl": null
+          "exit_price": 864.7,
+          "exit_time": "15:15",
+          "exit_reason": "15:15 Time Exit",
+          "pnl": 1277.2499999999986
         }
       ],
       "last_price": 868.8000000000001,
@@ -930,7 +930,7 @@
           "vwap": 900.85
         }
       ],
-      "squared_off": false
+      "squared_off": true
     },
     "B": {
       "strikes": [
@@ -1018,10 +1018,10 @@
           "entry_price": 944.0,
           "min_price": 917.15,
           "trailing_stop": 922.9499999999999,
-          "exit_price": null,
-          "exit_time": null,
-          "exit_reason": null,
-          "pnl": null
+          "exit_price": 896.1499999999999,
+          "exit_time": "15:15",
+          "exit_reason": "15:15 Time Exit",
+          "pnl": 3110.250000000009
         }
       ],
       "last_price": 919.2,
@@ -1849,7 +1849,7 @@
           "vwap": 950.81
         }
       ],
-      "squared_off": false
+      "squared_off": true
     },
     "C": {
       "strikes": [
@@ -1937,10 +1937,10 @@
           "entry_price": 889.05,
           "min_price": 889.05,
           "trailing_stop": 906.4,
-          "exit_price": null,
-          "exit_time": null,
-          "exit_reason": null,
-          "pnl": null
+          "exit_price": 895.4499999999999,
+          "exit_time": "15:15",
+          "exit_reason": "15:15 Time Exit",
+          "pnl": -415.9999999999985
         }
       ],
       "last_price": 889.05,
@@ -2768,7 +2768,7 @@
           "vwap": 903.94
         }
       ],
-      "squared_off": false
+      "squared_off": true
     }
   }
 }
