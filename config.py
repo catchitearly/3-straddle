@@ -99,7 +99,7 @@ DASHBOARD_SEND_INTERVAL_SECONDS = 5 * 60
 # ---------------------------------------------------------------------------
 MARKET_OPEN_TIME = "09:15"
 STRIKE_FIX_TIME = "09:45"                   # spot sampled here to fix ATM strike
-SIGNAL_START_TIME = "09:45"                 # entries only considered from here
+SIGNAL_START_TIME = "09:15"                 # entries only considered from here
 SQUARE_OFF_TIME = "15:15"                   # all open straddles closed here
 MARKET_CLOSE_TIME = "15:30"
 
