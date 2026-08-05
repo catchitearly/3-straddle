@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="refresh" content="60">
 <title>Live Straddle Status</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.32.0/plotly.min.js"></script>
 <style>
 :root {
   --bg: #0f1115; --panel: #171a21; --border: #2a2f3a;
@@ -17,6 +18,7 @@ body {
   margin: 0; padding: 24px;
 }
 h1 { font-size: 20px; margin: 0 0 4px 0; }
+h2 { font-size: 16px; margin: 0 0 10px 0; }
 .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -33,6 +35,10 @@ a:hover { text-decoration: underline; }
 .chart-box {
   background: var(--panel); border: 1px solid var(--border);
   border-radius: 8px; padding: 14px 18px; margin-bottom: 14px;
+}
+.set-section {
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; margin-bottom: 24px; background: #12141a;
 }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
@@ -53,38 +59,9 @@ td.open-badge { color: var(--accent); font-weight: 600; }
 <div class="nav" style="color: var(--muted);">Backtest dashboard not generated yet</div>
 
     <h1>Live Straddle Basket Status
-      <span class="status-pill done">SQUARED OFF</span>
+      <span class="status-pill live">AWAITING STRIKES</span>
     </h1>
-    <div class="subtitle">2026-08-04 &middot; auto-refreshes every 2 minutes while the notifier is running</div>
-    
-        <div class="summary">
-          <div class="stat"><div class="label">Realized PnL</div>
-            <div class="value neg">&#8377;-153</div></div>
-          <div class="stat"><div class="label">Baskets Deployed</div><div class="value">1</div></div>
-          <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
-          <div class="stat"><div class="label">Closed</div><div class="value">1</div></div>
-        </div>
-        <div class="chart-box">
-          <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-            Strikes: <b style="color:var(--text)">24500 / 24600 / 24700</b>
-            &nbsp;&middot;&nbsp; Expiry: <b style="color:var(--text)">26804</b>
-            &nbsp;&middot;&nbsp; Last update: <b style="color:var(--text)">15:14</b> IST
-          </div>
-          <div style="font-size:14px;">Combined price: <b>475.60</b> vs VWAP <b>391.15</b></div>
-        </div>
-        <div class="chart-box">
-          <table>
-            <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
-            <tbody><tr>
-                <td>#1</td>
-                <td>10:18</td>
-                <td>317.00</td>
-                <td>10:28</td>
-                <td>319.35</td>
-                <td>Trailing Stop Hit (2.0x ATR)</td>
-                <td class="pnl-neg">-152.75</td>
-            </tr></tbody>
-          </table>
-        </div>
+    <div class="subtitle">2026-08-05 &middot; ATM - &middot; expiry - &middot; auto-refreshes every 60 seconds</div>
+    <div class="chart-box no-data">Strikes not fixed yet - waiting for 09:45 IST.</div>
 </body>
 </html>

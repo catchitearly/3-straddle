@@ -1,40 +1,54 @@
 {
-  "date": "2026-08-04",
-  "strike_fixed": true,
-  "atm_strike": 24600,
-  "strikes": [
-    24500,
-    24600,
-    24700
-  ],
-  "expiry": "26804",
-  "leg_symbols": [
-    "NSE:NIFTY2680424500CE",
-    "NSE:NIFTY2680424500PE",
-    "NSE:NIFTY2680424600CE",
-    "NSE:NIFTY2680424600PE",
-    "NSE:NIFTY2680424700CE",
-    "NSE:NIFTY2680424700PE"
-  ],
-  "was_below_vwap": false,
-  "first_check_done": true,
-  "baskets_deployed": 1,
-  "entries": [
-    {
-      "basket_num": 1,
-      "entry_epoch": 1785818880,
-      "entry_time": "10:18",
-      "entry_price": 317.0,
-      "min_price": 315.05,
-      "trailing_stop": 316.62857142857143,
-      "exit_price": 319.35,
-      "exit_time": "10:28",
-      "exit_reason": "Trailing Stop Hit (2.0x ATR)",
-      "pnl": -152.75000000000148
+  "date": "2026-08-05",
+  "strike_fixed": false,
+  "atm_strike": null,
+  "all_strikes": null,
+  "all_leg_symbols": null,
+  "expiry": null,
+  "last_heartbeat_epoch": null,
+  "last_dashboard_sent_epoch": null,
+  "basket_sets": {
+    "A": {
+      "strikes": null,
+      "symbols": null,
+      "was_below_vwap": false,
+      "first_check_done": false,
+      "last_evaluated_epoch": null,
+      "baskets_deployed": 0,
+      "entries": [],
+      "last_price": null,
+      "last_vwap": null,
+      "last_updated": null,
+      "series": [],
+      "squared_off": false
+    },
+    "B": {
+      "strikes": null,
+      "symbols": null,
+      "was_below_vwap": false,
+      "first_check_done": false,
+      "last_evaluated_epoch": null,
+      "baskets_deployed": 0,
+      "entries": [],
+      "last_price": null,
+      "last_vwap": null,
+      "last_updated": null,
+      "series": [],
+      "squared_off": false
+    },
+    "C": {
+      "strikes": null,
+      "symbols": null,
+      "was_below_vwap": false,
+      "first_check_done": false,
+      "last_evaluated_epoch": null,
+      "baskets_deployed": 0,
+      "entries": [],
+      "last_price": null,
+      "last_vwap": null,
+      "last_updated": null,
+      "series": [],
+      "squared_off": false
     }
-  ],
-  "squared_off": true,
-  "last_price": 475.6,
-  "last_vwap": 391.15044259943426,
-  "last_updated": "15:14"
+  }
 }
