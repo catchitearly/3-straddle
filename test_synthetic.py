@@ -1,15 +1,15 @@
 """
-Synthetic smoke test for the 3-straddle BASKET engine. Fabricates CE/PE 1-min
-candles for 3 strikes (ATM-100, ATM, ATM+100) with a known price path, runs it
-through the real backtest engine (bypassing the Fyers network call), and
-generates the dashboard.
+Synthetic smoke test. Builds fake CE/PE 1-min candles for a couple of days
+with a known price path, runs it through the real backtest engine (bypassing
+the Fyers network call), and generates the dashboard - so we can sanity check
+the VWAP math, entry/exit logic, and rendering without live API access.
 """
 
 import math
 import random
 
 import config
-from src.ist_time import ist_datetime, ist_to_epoch, date_range_str, is_weekend
+from src.ist_time import ist_datetime, ist_to_epoch
 from src.straddle_backtest import run_day_backtest
 from src.dashboard_generator import generate_dashboard
 
@@ -18,11 +18,13 @@ class FakeClient:
     def __init__(self, seed=0):
         self.rng = random.Random(seed)
 
-    def get_day_candles(self, symbol, date_str, resolution=None, use_cache=True):
+    def get_day_candles(self, symbol, date_str, resolution=None, use_cache=True,
+                         persist_cache=True):
         start = ist_to_epoch(ist_datetime(date_str, config.MARKET_OPEN_TIME))
         end = ist_to_epoch(ist_datetime(date_str, config.MARKET_CLOSE_TIME))
 
         if "NIFTY50-INDEX" in symbol:
+            # underlying spot: wiggle around 24800
             base = 24800
             candles = []
             for epoch in range(start, end, 60):
@@ -42,10 +44,9 @@ class FakeClient:
         is_ce = symbol.endswith("CE")
         body = symbol[:-2]  # strip CE/PE
         strike = 24800
-        for candidate in (24700, 24800, 24900):
+        for candidate in (24600, 24700, 24800, 24900, 25000):
             if body.endswith(str(candidate)):
                 strike = candidate
-                break
         distance = abs(strike - 24800)
 
         candles = []
@@ -68,12 +69,8 @@ class FakeClient:
 def main():
     client = FakeClient(seed=42)
     results = []
-    for date_str in date_range_str(config.BACKTEST_START_DATE, config.BACKTEST_END_DATE):
-        if is_weekend(date_str):
-            continue
+    for date_str in ["2026-07-15", "2026-07-16"]:
         r = run_day_backtest(date_str, client)
-        if r is None:
-            continue
         results.append(r)
         print(date_str, "->", {k: v for k, v in r.items() if k not in ("series",)})
 

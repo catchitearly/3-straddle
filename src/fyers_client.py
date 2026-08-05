@@ -2,7 +2,7 @@
 Fyers v3 historical data client, using the official fyers_apiv3 SDK.
 
 Auth: reads FYERS_APP_ID / FYERS_ACCESS_TOKEN from environment (set these as
-GitHub Actions secrets - see .github/workflows/backtest.yml).
+GitHub Actions secrets, or in a local .env file - see src/env_loader.py).
 
 Caches every symbol/date/resolution combo to a local JSON file so repeated
 backtest runs don't re-hit the API (also keeps you under rate limits).

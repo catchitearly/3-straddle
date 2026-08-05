@@ -1,8 +1,8 @@
 """
 Entry point. Loops over trading days in [BACKTEST_START_DATE, BACKTEST_END_DATE],
 runs the straddle-VWAP backtest for each, and writes:
-    output/results.json   - raw data consumed by the dashboard generator
-    output/index.html     - the Plotly dashboard (tabs per day)
+    docs/results.json   - raw data consumed by the dashboard generator
+    docs/index.html     - the Plotly dashboard (tabs per day)
 """
 
 import json

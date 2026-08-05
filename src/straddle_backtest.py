@@ -5,6 +5,12 @@ Key Features:
 - First Entry at 09:45 if price < VWAP.
 - Fresh downward crossings (was >= VWAP, now < VWAP) deploy new baskets.
 - Exits when price > VWAP OR when ATR Trailing Stop is hit OR at 15:15 IST.
+
+This is the BATCH backtest engine - single 3-strike basket
+(config.BACKTEST_STRIKE_OFFSETS), 1-minute REST candles. The live paths
+(live_notifier.py / live_notifier_local.py) run a different, multi-set
+strategy via src/live_engine.py - see README's "Live: three basket sets"
+section.
 """
 
 from src.ist_time import ist_datetime, ist_to_epoch, epoch_to_ist_time_str
@@ -38,8 +44,7 @@ def compute_basket_atr(merged_series, period=14):
 
 def merge_basket_series(leg_candles_by_symbol):
     """
-    leg_candles_by_symbol: dict of symbol -> list of candle dicts (6 entries:
-    3 strikes x CE/PE).
+    leg_candles_by_symbol: dict of symbol -> list of candle dicts.
 
     Merge on epochs common to ALL legs into a combined basket series:
         [{"epoch", "price" (sum of closes), "volume" (sum of volumes),
@@ -87,7 +92,7 @@ def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=None):
         return None
 
     atm_strike = round_to_nearest_strike(spot_bar["close"])
-    strikes = sorted(atm_strike + off for off in config.STRIKE_OFFSETS)
+    strikes = sorted(atm_strike + off for off in config.BACKTEST_STRIKE_OFFSETS)
 
     # --- 2. Build Option Symbols & Fetch Candles ---
     leg_symbols = {}
@@ -173,7 +178,7 @@ def run_day_backtest(trade_date_str, fyers_client, atr_multiplier=None):
             # Record lowest price reached (High-Water Mark for Short trade)
             if price < b["min_price"]:
                 b["min_price"] = price
-                # Update trailing stop line: min_price + (atr_multiplier * ATR)
+                # Update trailing stop line: min_price + (2.0 * ATR)
                 b["trailing_stop"] = b["min_price"] + (atr_multiplier * atr)
 
             # CHECK EXITS

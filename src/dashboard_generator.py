@@ -188,7 +188,7 @@ def _build_html(payloads, summary):
 
 <div class="nav" style="margin-bottom:16px; font-size:13px;"><a href="live.html" style="color:#4f8cff; text-decoration:none;">Live status &rarr;</a></div>
 <h1>Nifty 3-Straddle Basket &middot; VWAP Mean-Reversion Backtest</h1>
-<div class="subtitle">ATM-100 / ATM / ATM+100 straddles fixed at 09:45 &middot; sell basket on downward VWAP cross (repeats on every fresh cross) &middot; square-off 15:15</div>
+<div class="subtitle">ATM straddle fixed at 09:45 &middot; sell on downward VWAP cross &middot; square-off 15:15</div>
 
 <div class="summary">
   <div class="stat"><div class="label">Total PnL</div>
@@ -284,14 +284,14 @@ function renderCharts(idx) {{
   }};
   const entryTrace = {{
     x: d.entries.map(e => e.entry_time), y: d.entries.map(e => e.entry_price),
-    type: 'scatter', mode: 'markers+text', name: 'Sell Basket',
+    type: 'scatter', mode: 'markers+text', name: 'Sell Entry',
     text: d.entries.map(e => '#' + e.basket_num),
     textposition: 'top center', textfont: {{color: '#ff5c5c', size: 10}},
     marker: {{color: '#ff5c5c', size: 9, symbol: 'triangle-down'}}
   }};
 
   const priceLayout = {{
-    title: {{text: 'Combined 3-Straddle Basket Price vs VWAP', font: {{color: '#e6e8ec', size: 13}}}},
+    title: {{text: 'Combined Basket Price vs VWAP', font: {{color: '#e6e8ec', size: 13}}}},
     paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
     font: {{color: '#8a90a0', size: 11}},
     margin: {{l: 50, r: 20, t: 30, b: 30}},
@@ -322,14 +322,10 @@ function selectTab(idx) {{
   document.querySelector(`.tab-btn[data-idx="${{idx}}"]`).classList.add('active');
   document.getElementById('panel-' + idx).classList.add('active');
 
-  // Lazy render: only build the Plotly figure the first time this tab is
-  // shown, and only now that the container is actually visible (avoids the
-  // 0-width hidden-div rendering bug).
   if (!renderedTabs.has(idx)) {{
     renderCharts(idx);
     renderedTabs.add(idx);
   }} else {{
-    // container was resized while hidden (e.g. window resize) - relayout
     Plotly.Plots.resize('price-chart-' + idx);
     Plotly.Plots.resize('pnl-chart-' + idx);
   }}

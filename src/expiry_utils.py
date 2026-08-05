@@ -17,7 +17,7 @@ import re
 from datetime import datetime, timedelta
 
 import config
-from src.ist_time import IST, weekday_of
+from src.ist_time import IST
 
 _WEEKLY_CODE_RE = re.compile(r"^\d{5,6}$")           # e.g. "26804", "261004"
 _MONTHLY_CODE_RE = re.compile(r"^\d{2}[A-Z]{3}$")     # e.g. "26JUL"

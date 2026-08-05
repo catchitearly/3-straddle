@@ -4,6 +4,9 @@ Simulates a full day of cron-job.org triggering live_notifier.py every
 test_synthetic.py, but feeding it incrementally (as if "now" keeps advancing)
 rather than all at once. Also stubs out send_telegram_message so we can see
 exactly what alerts would have fired, without needing real credentials.
+
+Now exercises THREE basket sets (config.BASKET_SETS) since live_notifier.py
+runs all three independently.
 """
 
 import os

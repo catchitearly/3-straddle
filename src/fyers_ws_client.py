@@ -1,7 +1,8 @@
 """
-Fyers v3 WebSocket client - builds 1-minute OHLCV candles LOCALLY from a live
-tick stream, for live_notifier_local.py running continuously on your own
-machine. No REST polling, no GitHub Actions.
+Fyers v3 WebSocket client - builds candles LOCALLY from a live tick stream,
+at config.LIVE_BAR_SECONDS resolution (5 seconds by default), for
+live_notifier_local.py running continuously on your own machine. No REST
+polling, no GitHub Actions.
 
 Based on Fyers' official sample pattern (fyers_apiv3.FyersWebsocket.data_ws,
 "SymbolUpdate" mode): https://github.com/FyersDev/fyers-api-sample-code
@@ -18,10 +19,12 @@ this for real trading:
     few seconds - if you see "WARNING: ws tick missing ltp/volume keys",
     print the raw `message` dict once to see the exact keys your installed
     version sends, and adjust _parse_tick() accordingly.
-  - Per-minute volume is derived by diffing Fyers' cumulative "volume traded
-    today" figure across the minute boundary - if a tick is missed right at
-    a minute boundary, that minute's volume can be slightly off. This only
-    affects VWAP's volume weighting, not the price itself.
+  - Per-bar volume is derived by diffing Fyers' cumulative "volume traded
+    today" figure across the bar boundary - if a tick is missed right at a
+    boundary, that bar's volume can be slightly off. This only affects
+    VWAP's volume weighting, not the price itself. At 5-second bars this
+    matters a bit more than it did at 1-minute bars, since there's less
+    volume accumulated per bar to smooth over a missed tick.
 """
 
 import os
@@ -53,11 +56,11 @@ class FyersWSClient:
         self._lock = threading.Lock()
         self._connected = threading.Event()
 
-        # in-progress (not yet finalized) minute bar per symbol
+        # in-progress (not yet finalized) bar per symbol
         self._current_bar = {}
-        # finalized 1-min candles today, per symbol: [{"epoch","open","high","low","close","volume"}, ...]
+        # finalized candles today, per symbol: [{"epoch","open","high","low","close","volume"}, ...]
         self._candles = {}
-        # last-seen cumulative "volume traded today" per symbol, for diffing into per-minute volume
+        # last-seen cumulative "volume traded today" per symbol, for diffing into per-bar volume
         self._last_day_vol = {}
 
     # --- tick parsing --------------------------------------------------------
@@ -72,25 +75,37 @@ class FyersWSClient:
         cum_vol = message.get("vol_traded_today", message.get("tot_traded_qty"))
         return symbol, ltp, cum_vol
 
+    # Non-tick control/acknowledgment message types Fyers sends over the same
+    # socket (connection confirmed, mode changed, subscribe/unsubscribe ack).
+    # These never carry a symbol/ltp, so don't warn about them as if they
+    # were malformed ticks.
+    _CONTROL_MESSAGE_TYPES = {"cn", "ful", "lite", "sub", "unsub"}
+
     def _on_message(self, message):
         try:
+            msg_type = message.get("type")
+            if msg_type in self._CONTROL_MESSAGE_TYPES:
+                print(f"WS control message: {message}")
+                return
+
             symbol, ltp, cum_vol = self._parse_tick(message)
             if not symbol or ltp is None:
                 print(f"WARNING: ws tick missing symbol/ltp keys: {message}")
                 return
             ltp = float(ltp)
             cum_vol = float(cum_vol) if cum_vol is not None else None
-            minute_epoch = (int(time.time()) // 60) * 60
+            bar_seconds = config.LIVE_BAR_SECONDS
+            bar_epoch = (int(time.time()) // bar_seconds) * bar_seconds
 
             with self._lock:
                 cur = self._current_bar.get(symbol)
-                if cur is None or cur["minute"] != minute_epoch:
+                if cur is None or cur["bar_epoch"] != bar_epoch:
                     if cur is not None:
                         self._finalize_bar_locked(symbol, cur)
                     vol_at_open = self._last_day_vol.get(
                         symbol, cum_vol if cum_vol is not None else 0.0)
                     self._current_bar[symbol] = {
-                        "minute": minute_epoch,
+                        "bar_epoch": bar_epoch,
                         "open": ltp, "high": ltp, "low": ltp, "close": ltp,
                         "vol_at_open": vol_at_open,
                     }
@@ -110,11 +125,11 @@ class FyersWSClient:
         """Caller must hold self._lock."""
         vol_at_open = bar["vol_at_open"] or 0.0
         vol_at_close = self._last_day_vol.get(symbol, vol_at_open)
-        minute_volume = max(0.0, vol_at_close - vol_at_open)
+        bar_volume = max(0.0, vol_at_close - vol_at_open)
         self._candles.setdefault(symbol, []).append({
-            "epoch": bar["minute"],
+            "epoch": bar["bar_epoch"],
             "open": bar["open"], "high": bar["high"], "low": bar["low"],
-            "close": bar["close"], "volume": minute_volume,
+            "close": bar["close"], "volume": bar_volume,
         })
 
     # --- connection lifecycle -------------------------------------------------
@@ -170,16 +185,16 @@ class FyersWSClient:
     # --- reading accumulated data ----------------------------------------------
 
     def flush_current_bar(self, symbol):
-        """Force-finalize symbol's in-progress bar right now, even if its
-        minute hasn't technically closed yet. Used at the strike-fix moment
+        """Force-finalize symbol's in-progress bar right now, even if the bar
+        window hasn't technically closed yet. Used at the strike-fix moment
         and at square-off, where we want 'price right now', not 'price as of
-        the last fully-closed minute'."""
+        the last fully-closed bar'."""
         with self._lock:
             cur = self._current_bar.get(symbol)
             if cur:
                 self._finalize_bar_locked(symbol, dict(cur))
                 # keep the (still-live) current bar in place too - don't drop it,
-                # future ticks in the same minute should keep updating it normally.
+                # future ticks in the same bar window should keep updating it normally.
 
     def get_candles(self, symbol):
         with self._lock:
