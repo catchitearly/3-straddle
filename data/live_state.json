@@ -22,7 +22,7 @@
     "NSE:NIFTY2681124800PE"
   ],
   "expiry": "26811",
-  "last_heartbeat_epoch": 1786002392,
+  "last_heartbeat_epoch": 1786003367,
   "last_dashboard_sent_epoch": null,
   "basket_sets": {
     "A": {
