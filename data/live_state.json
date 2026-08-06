@@ -41,17 +41,22 @@
       ],
       "was_below_vwap": false,
       "first_check_done": true,
-      "last_evaluated_epoch": 1785989880,
+      "last_evaluated_epoch": 1785990000,
       "baskets_deployed": 0,
       "entries": [],
-      "last_price": 876.05,
-      "last_vwap": 833.2298773706193,
-      "last_updated": "09:48:00",
+      "last_price": 885.85,
+      "last_vwap": 835.6554261998264,
+      "last_updated": "09:50:00",
       "series": [
         {
           "time": "09:48:00",
           "price": 876.05,
           "vwap": 833.23
+        },
+        {
+          "time": "09:50:00",
+          "price": 885.85,
+          "vwap": 835.66
         }
       ],
       "squared_off": false
@@ -72,17 +77,22 @@
       ],
       "was_below_vwap": false,
       "first_check_done": true,
-      "last_evaluated_epoch": 1785989880,
+      "last_evaluated_epoch": 1785990000,
       "baskets_deployed": 0,
       "entries": [],
-      "last_price": 982.5,
-      "last_vwap": 920.3110241143828,
-      "last_updated": "09:48:00",
+      "last_price": 986.95,
+      "last_vwap": 922.7118166618254,
+      "last_updated": "09:50:00",
       "series": [
         {
           "time": "09:48:00",
           "price": 982.5,
           "vwap": 920.31
+        },
+        {
+          "time": "09:50:00",
+          "price": 986.95,
+          "vwap": 922.71
         }
       ],
       "squared_off": false
@@ -103,17 +113,22 @@
       ],
       "was_below_vwap": false,
       "first_check_done": true,
-      "last_evaluated_epoch": 1785989880,
+      "last_evaluated_epoch": 1785990000,
       "baskets_deployed": 0,
       "entries": [],
-      "last_price": 835.75,
-      "last_vwap": 814.2965760930765,
-      "last_updated": "09:48:00",
+      "last_price": 846.55,
+      "last_vwap": 815.9666645901438,
+      "last_updated": "09:50:00",
       "series": [
         {
           "time": "09:48:00",
           "price": 835.75,
           "vwap": 814.3
+        },
+        {
+          "time": "09:50:00",
+          "price": 846.55,
+          "vwap": 815.97
         }
       ],
       "squared_off": false
