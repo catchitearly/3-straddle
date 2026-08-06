@@ -41,7 +41,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1786005480,
+      "last_evaluated_epoch": 1786005600,
       "baskets_deployed": 1,
       "entries": [
         {
@@ -57,9 +57,9 @@
           "pnl": 939.2499999999956
         }
       ],
-      "last_price": 841.1000000000001,
-      "last_vwap": 861.3540549129337,
-      "last_updated": "14:08:00",
+      "last_price": 840.75,
+      "last_vwap": 861.2414593764803,
+      "last_updated": "14:10:00",
       "series": [
         {
           "time": "09:48:00",
@@ -700,6 +700,11 @@
           "time": "14:08:00",
           "price": 841.1,
           "vwap": 861.35
+        },
+        {
+          "time": "14:10:00",
+          "price": 840.75,
+          "vwap": 861.24
         }
       ],
       "squared_off": false
@@ -720,7 +725,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1786005480,
+      "last_evaluated_epoch": 1786005600,
       "baskets_deployed": 2,
       "entries": [
         {
@@ -748,9 +753,9 @@
           "pnl": 533.0000000000103
         }
       ],
-      "last_price": 942.5000000000001,
-      "last_vwap": 947.4266084983133,
-      "last_updated": "14:08:00",
+      "last_price": 939.0999999999999,
+      "last_vwap": 947.3905420237604,
+      "last_updated": "14:10:00",
       "series": [
         {
           "time": "09:48:00",
@@ -1391,6 +1396,11 @@
           "time": "14:08:00",
           "price": 942.5,
           "vwap": 947.43
+        },
+        {
+          "time": "14:10:00",
+          "price": 939.1,
+          "vwap": 947.39
         }
       ],
       "squared_off": false
@@ -1411,7 +1421,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1786005480,
+      "last_evaluated_epoch": 1786005600,
       "baskets_deployed": 4,
       "entries": [
         {
@@ -1463,9 +1473,9 @@
           "pnl": null
         }
       ],
-      "last_price": 806.9,
-      "last_vwap": 839.6076285862932,
-      "last_updated": "14:08:00",
+      "last_price": 807.95,
+      "last_vwap": 839.4400737008375,
+      "last_updated": "14:10:00",
       "series": [
         {
           "time": "09:48:00",
@@ -2106,6 +2116,11 @@
           "time": "14:08:00",
           "price": 806.9,
           "vwap": 839.61
+        },
+        {
+          "time": "14:10:00",
+          "price": 807.95,
+          "vwap": 839.44
         }
       ],
       "squared_off": false
