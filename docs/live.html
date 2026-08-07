@@ -69,16 +69,16 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       </h2>
       <div class="summary">
         <div class="stat"><div class="label">Realized PnL</div>
-          <div class="value pos">&#8377;+0</div></div>
+          <div class="value pos">&#8377;+426</div></div>
         <div class="stat"><div class="label">Baskets Deployed</div><div class="value">1</div></div>
-        <div class="stat"><div class="label">Open</div><div class="value">1</div></div>
-        <div class="stat"><div class="label">Closed</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Closed</div><div class="value">1</div></div>
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">10:38:00</b> IST
+          Last update: <b style="color:var(--text)">10:40:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>799.40</b> vs VWAP <b>806.54</b></div>
+        <div style="font-size:14px;">Combined price: <b>801.25</b> vs VWAP <b>806.45</b></div>
       </div>
       <div class="chart-box"><div id="chart-A" style="height:320px;"></div></div>
       <div class="chart-box">
@@ -88,18 +88,18 @@ td.open-badge { color: var(--accent); font-weight: 600; }
             <td>#1</td>
             <td>10:14:00</td>
             <td>807.80</td>
-            <td>-</td>
-            <td>-</td>
-            <td><span class="open-badge">OPEN</span></td>
-            <td class="pnl-pos">-</td>
+            <td>10:40:00</td>
+            <td>801.25</td>
+            <td>Trailing Stop Hit (2.0x ATR)</td>
+            <td class="pnl-pos">+425.75</td>
         </tr></tbody>
         </table>
       </div>
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 814.2, "vwap": 806.12}, {"time": "09:50:00", "price": 819.15, "vwap": 806.44}, {"time": "09:52:00", "price": 824.7, "vwap": 807.55}, {"time": "09:54:00", "price": 828.35, "vwap": 808.0}, {"time": "09:56:00", "price": 829.45, "vwap": 808.63}, {"time": "09:58:00", "price": 829.05, "vwap": 809.08}, {"time": "10:00:00", "price": 826.6, "vwap": 809.5}, {"time": "10:02:00", "price": 818.15, "vwap": 809.85}, {"time": "10:04:00", "price": 816.95, "vwap": 810.05}, {"time": "10:06:00", "price": 819.3, "vwap": 810.26}, {"time": "10:08:00", "price": 819.4, "vwap": 810.49}, {"time": "10:10:00", "price": 816.1, "vwap": 810.59}, {"time": "10:12:00", "price": 812.85, "vwap": 810.65}, {"time": "10:14:00", "price": 807.8, "vwap": 810.49}, {"time": "10:16:00", "price": 804.45, "vwap": 810.23}, {"time": "10:18:00", "price": 794.45, "vwap": 809.7}, {"time": "10:20:00", "price": 795.65, "vwap": 808.69}, {"time": "10:22:00", "price": 798.55, "vwap": 808.41}, {"time": "10:24:00", "price": 798.3, "vwap": 808.01}, {"time": "10:26:00", "price": 795.55, "vwap": 807.81}, {"time": "10:28:00", "price": 795.95, "vwap": 807.51}, {"time": "10:31:00", "price": 796.0, "vwap": 807.12}, {"time": "10:32:00", "price": 800.15, "vwap": 807.0}, {"time": "10:34:00", "price": 799.25, "vwap": 806.85}, {"time": "10:36:00", "price": 797.45, "vwap": 806.63}, {"time": "10:38:00", "price": 799.4, "vwap": 806.54}];
-      const entries = [{"basket_num": 1, "entry_epoch": 1786077840, "entry_time": "10:14:00", "entry_price": 807.8, "min_price": 794.45, "trailing_stop": 801.0285714285714, "exit_price": null, "exit_time": null, "exit_reason": null, "pnl": null}];
+      const series = [{"time": "09:48:00", "price": 814.2, "vwap": 806.12}, {"time": "09:50:00", "price": 819.15, "vwap": 806.44}, {"time": "09:52:00", "price": 824.7, "vwap": 807.55}, {"time": "09:54:00", "price": 828.35, "vwap": 808.0}, {"time": "09:56:00", "price": 829.45, "vwap": 808.63}, {"time": "09:58:00", "price": 829.05, "vwap": 809.08}, {"time": "10:00:00", "price": 826.6, "vwap": 809.5}, {"time": "10:02:00", "price": 818.15, "vwap": 809.85}, {"time": "10:04:00", "price": 816.95, "vwap": 810.05}, {"time": "10:06:00", "price": 819.3, "vwap": 810.26}, {"time": "10:08:00", "price": 819.4, "vwap": 810.49}, {"time": "10:10:00", "price": 816.1, "vwap": 810.59}, {"time": "10:12:00", "price": 812.85, "vwap": 810.65}, {"time": "10:14:00", "price": 807.8, "vwap": 810.49}, {"time": "10:16:00", "price": 804.45, "vwap": 810.23}, {"time": "10:18:00", "price": 794.45, "vwap": 809.7}, {"time": "10:20:00", "price": 795.65, "vwap": 808.69}, {"time": "10:22:00", "price": 798.55, "vwap": 808.41}, {"time": "10:24:00", "price": 798.3, "vwap": 808.01}, {"time": "10:26:00", "price": 795.55, "vwap": 807.81}, {"time": "10:28:00", "price": 795.95, "vwap": 807.51}, {"time": "10:31:00", "price": 796.0, "vwap": 807.12}, {"time": "10:32:00", "price": 800.15, "vwap": 807.0}, {"time": "10:34:00", "price": 799.25, "vwap": 806.85}, {"time": "10:36:00", "price": 797.45, "vwap": 806.63}, {"time": "10:38:00", "price": 799.4, "vwap": 806.54}, {"time": "10:40:00", "price": 801.25, "vwap": 806.45}];
+      const entries = [{"basket_num": 1, "entry_epoch": 1786077840, "entry_time": "10:14:00", "entry_price": 807.8, "min_price": 794.45, "trailing_stop": 801.0285714285714, "exit_price": 801.25, "exit_time": "10:40:00", "exit_reason": "Trailing Stop Hit (2.0x ATR)", "pnl": 425.74999999999704}];
       if (series.length === 0) return;
 
       const times = series.map(b => b.time);
@@ -154,9 +154,9 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">10:38:00</b> IST
+          Last update: <b style="color:var(--text)">10:40:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>830.95</b> vs VWAP <b>857.88</b></div>
+        <div style="font-size:14px;">Combined price: <b>834.35</b> vs VWAP <b>857.55</b></div>
       </div>
       <div class="chart-box"><div id="chart-B" style="height:320px;"></div></div>
       <div class="chart-box">
@@ -176,7 +176,7 @@ td.open-badge { color: var(--accent); font-weight: 600; }
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 872.25, "vwap": 862.12}, {"time": "09:50:00", "price": 882.15, "vwap": 862.6}, {"time": "09:52:00", "price": 892.95, "vwap": 864.31}, {"time": "09:54:00", "price": 897.45, "vwap": 865.02}, {"time": "09:56:00", "price": 898.9, "vwap": 865.97}, {"time": "09:58:00", "price": 896.4, "vwap": 866.61}, {"time": "10:00:00", "price": 894.2, "vwap": 867.23}, {"time": "10:02:00", "price": 881.2, "vwap": 867.77}, {"time": "10:04:00", "price": 878.6, "vwap": 868.05}, {"time": "10:06:00", "price": 881.8, "vwap": 868.36}, {"time": "10:08:00", "price": 880.35, "vwap": 868.71}, {"time": "10:10:00", "price": 878.25, "vwap": 868.84}, {"time": "10:12:00", "price": 869.5, "vwap": 868.82}, {"time": "10:14:00", "price": 859.95, "vwap": 868.42}, {"time": "10:16:00", "price": 852.35, "vwap": 867.81}, {"time": "10:18:00", "price": 834.65, "vwap": 866.7}, {"time": "10:20:00", "price": 836.6, "vwap": 864.5}, {"time": "10:22:00", "price": 837.95, "vwap": 863.8}, {"time": "10:24:00", "price": 834.25, "vwap": 862.73}, {"time": "10:26:00", "price": 829.7, "vwap": 862.23}, {"time": "10:28:00", "price": 829.6, "vwap": 861.37}, {"time": "10:31:00", "price": 828.65, "vwap": 860.15}, {"time": "10:32:00", "price": 828.35, "vwap": 859.5}, {"time": "10:34:00", "price": 831.7, "vwap": 858.88}, {"time": "10:36:00", "price": 832.6, "vwap": 858.3}, {"time": "10:38:00", "price": 830.95, "vwap": 857.88}];
+      const series = [{"time": "09:48:00", "price": 872.25, "vwap": 862.12}, {"time": "09:50:00", "price": 882.15, "vwap": 862.6}, {"time": "09:52:00", "price": 892.95, "vwap": 864.31}, {"time": "09:54:00", "price": 897.45, "vwap": 865.02}, {"time": "09:56:00", "price": 898.9, "vwap": 865.97}, {"time": "09:58:00", "price": 896.4, "vwap": 866.61}, {"time": "10:00:00", "price": 894.2, "vwap": 867.23}, {"time": "10:02:00", "price": 881.2, "vwap": 867.77}, {"time": "10:04:00", "price": 878.6, "vwap": 868.05}, {"time": "10:06:00", "price": 881.8, "vwap": 868.36}, {"time": "10:08:00", "price": 880.35, "vwap": 868.71}, {"time": "10:10:00", "price": 878.25, "vwap": 868.84}, {"time": "10:12:00", "price": 869.5, "vwap": 868.82}, {"time": "10:14:00", "price": 859.95, "vwap": 868.42}, {"time": "10:16:00", "price": 852.35, "vwap": 867.81}, {"time": "10:18:00", "price": 834.65, "vwap": 866.7}, {"time": "10:20:00", "price": 836.6, "vwap": 864.5}, {"time": "10:22:00", "price": 837.95, "vwap": 863.8}, {"time": "10:24:00", "price": 834.25, "vwap": 862.73}, {"time": "10:26:00", "price": 829.7, "vwap": 862.23}, {"time": "10:28:00", "price": 829.6, "vwap": 861.37}, {"time": "10:31:00", "price": 828.65, "vwap": 860.15}, {"time": "10:32:00", "price": 828.35, "vwap": 859.5}, {"time": "10:34:00", "price": 831.7, "vwap": 858.88}, {"time": "10:36:00", "price": 832.6, "vwap": 858.3}, {"time": "10:38:00", "price": 830.95, "vwap": 857.88}, {"time": "10:40:00", "price": 834.35, "vwap": 857.55}];
       const entries = [{"basket_num": 1, "entry_epoch": 1786077840, "entry_time": "10:14:00", "entry_price": 859.95, "min_price": 828.35, "trailing_stop": 832.25, "exit_price": 832.5999999999999, "exit_time": "10:36:00", "exit_reason": "Trailing Stop Hit (2.0x ATR)", "pnl": 1777.7500000000089}];
       if (series.length === 0) return;
 
@@ -232,9 +232,9 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">10:38:00</b> IST
+          Last update: <b style="color:var(--text)">10:40:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>841.95</b> vs VWAP <b>826.69</b></div>
+        <div style="font-size:14px;">Combined price: <b>845.60</b> vs VWAP <b>826.83</b></div>
       </div>
       <div class="chart-box"><div id="chart-C" style="height:320px;"></div></div>
       <div class="chart-box">
@@ -246,7 +246,7 @@ td.open-badge { color: var(--accent); font-weight: 600; }
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 826.25, "vwap": 822.43}, {"time": "09:50:00", "price": 827.45, "vwap": 822.56}, {"time": "09:52:00", "price": 828.05, "vwap": 822.89}, {"time": "09:54:00", "price": 828.55, "vwap": 823.03}, {"time": "09:56:00", "price": 828.6, "vwap": 823.22}, {"time": "09:58:00", "price": 830.35, "vwap": 823.39}, {"time": "10:00:00", "price": 828.85, "vwap": 823.53}, {"time": "10:02:00", "price": 826.65, "vwap": 823.67}, {"time": "10:04:00", "price": 826.1, "vwap": 823.73}, {"time": "10:06:00", "price": 828.7, "vwap": 823.82}, {"time": "10:08:00", "price": 826.75, "vwap": 823.88}, {"time": "10:10:00", "price": 828.2, "vwap": 823.93}, {"time": "10:12:00", "price": 827.55, "vwap": 824.04}, {"time": "10:14:00", "price": 827.0, "vwap": 824.14}, {"time": "10:16:00", "price": 828.0, "vwap": 824.28}, {"time": "10:18:00", "price": 826.35, "vwap": 824.35}, {"time": "10:20:00", "price": 828.45, "vwap": 824.66}, {"time": "10:22:00", "price": 833.65, "vwap": 824.81}, {"time": "10:24:00", "price": 835.3, "vwap": 825.05}, {"time": "10:26:00", "price": 832.5, "vwap": 825.13}, {"time": "10:28:00", "price": 836.05, "vwap": 825.38}, {"time": "10:31:00", "price": 838.65, "vwap": 825.77}, {"time": "10:32:00", "price": 847.25, "vwap": 826.11}, {"time": "10:34:00", "price": 838.2, "vwap": 826.36}, {"time": "10:36:00", "price": 836.85, "vwap": 826.49}, {"time": "10:38:00", "price": 841.95, "vwap": 826.69}];
+      const series = [{"time": "09:48:00", "price": 826.25, "vwap": 822.43}, {"time": "09:50:00", "price": 827.45, "vwap": 822.56}, {"time": "09:52:00", "price": 828.05, "vwap": 822.89}, {"time": "09:54:00", "price": 828.55, "vwap": 823.03}, {"time": "09:56:00", "price": 828.6, "vwap": 823.22}, {"time": "09:58:00", "price": 830.35, "vwap": 823.39}, {"time": "10:00:00", "price": 828.85, "vwap": 823.53}, {"time": "10:02:00", "price": 826.65, "vwap": 823.67}, {"time": "10:04:00", "price": 826.1, "vwap": 823.73}, {"time": "10:06:00", "price": 828.7, "vwap": 823.82}, {"time": "10:08:00", "price": 826.75, "vwap": 823.88}, {"time": "10:10:00", "price": 828.2, "vwap": 823.93}, {"time": "10:12:00", "price": 827.55, "vwap": 824.04}, {"time": "10:14:00", "price": 827.0, "vwap": 824.14}, {"time": "10:16:00", "price": 828.0, "vwap": 824.28}, {"time": "10:18:00", "price": 826.35, "vwap": 824.35}, {"time": "10:20:00", "price": 828.45, "vwap": 824.66}, {"time": "10:22:00", "price": 833.65, "vwap": 824.81}, {"time": "10:24:00", "price": 835.3, "vwap": 825.05}, {"time": "10:26:00", "price": 832.5, "vwap": 825.13}, {"time": "10:28:00", "price": 836.05, "vwap": 825.38}, {"time": "10:31:00", "price": 838.65, "vwap": 825.77}, {"time": "10:32:00", "price": 847.25, "vwap": 826.11}, {"time": "10:34:00", "price": 838.2, "vwap": 826.36}, {"time": "10:36:00", "price": 836.85, "vwap": 826.49}, {"time": "10:38:00", "price": 841.95, "vwap": 826.69}, {"time": "10:40:00", "price": 845.6, "vwap": 826.83}];
       const entries = [];
       if (series.length === 0) return;
 
