@@ -22,7 +22,7 @@
     "NSE:NIFTY2681124700PE"
   ],
   "expiry": "26811",
-  "last_heartbeat_epoch": null,
+  "last_heartbeat_epoch": 1786335517,
   "last_dashboard_sent_epoch": null,
   "basket_sets": {
     "A": {
@@ -39,15 +39,34 @@
         "NSE:NIFTY2681124600CE",
         "NSE:NIFTY2681124600PE"
       ],
-      "was_below_vwap": false,
-      "first_check_done": false,
-      "last_evaluated_epoch": null,
-      "baskets_deployed": 0,
-      "entries": [],
-      "last_price": null,
-      "last_vwap": null,
-      "last_updated": null,
-      "series": [],
+      "was_below_vwap": true,
+      "first_check_done": true,
+      "last_evaluated_epoch": 1786335480,
+      "baskets_deployed": 1,
+      "entries": [
+        {
+          "basket_num": 1,
+          "entry_epoch": 1786335480,
+          "entry_time": "09:48:00",
+          "entry_price": 622.3,
+          "min_price": 622.3,
+          "trailing_stop": 625.9285714285713,
+          "exit_price": null,
+          "exit_time": null,
+          "exit_reason": null,
+          "pnl": null
+        }
+      ],
+      "last_price": 622.3,
+      "last_vwap": 646.9337145899252,
+      "last_updated": "09:48:00",
+      "series": [
+        {
+          "time": "09:48:00",
+          "price": 622.3,
+          "vwap": 646.93
+        }
+      ],
       "squared_off": false
     },
     "B": {
@@ -64,15 +83,34 @@
         "NSE:NIFTY2681124500CE",
         "NSE:NIFTY2681124500PE"
       ],
-      "was_below_vwap": false,
-      "first_check_done": false,
-      "last_evaluated_epoch": null,
-      "baskets_deployed": 0,
-      "entries": [],
-      "last_price": null,
-      "last_vwap": null,
-      "last_updated": null,
-      "series": [],
+      "was_below_vwap": true,
+      "first_check_done": true,
+      "last_evaluated_epoch": 1786335480,
+      "baskets_deployed": 1,
+      "entries": [
+        {
+          "basket_num": 1,
+          "entry_epoch": 1786335480,
+          "entry_time": "09:48:00",
+          "entry_price": 725.85,
+          "min_price": 725.85,
+          "trailing_stop": 738.0785714285714,
+          "exit_price": null,
+          "exit_time": null,
+          "exit_reason": null,
+          "pnl": null
+        }
+      ],
+      "last_price": 725.85,
+      "last_vwap": 759.9838824609648,
+      "last_updated": "09:48:00",
+      "series": [
+        {
+          "time": "09:48:00",
+          "price": 725.85,
+          "vwap": 759.98
+        }
+      ],
       "squared_off": false
     },
     "C": {
@@ -89,15 +127,34 @@
         "NSE:NIFTY2681124700CE",
         "NSE:NIFTY2681124700PE"
       ],
-      "was_below_vwap": false,
-      "first_check_done": false,
-      "last_evaluated_epoch": null,
-      "baskets_deployed": 0,
-      "entries": [],
-      "last_price": null,
-      "last_vwap": null,
-      "last_updated": null,
-      "series": [],
+      "was_below_vwap": true,
+      "first_check_done": true,
+      "last_evaluated_epoch": 1786335480,
+      "baskets_deployed": 1,
+      "entries": [
+        {
+          "basket_num": 1,
+          "entry_epoch": 1786335480,
+          "entry_time": "09:48:00",
+          "entry_price": 610.4,
+          "min_price": 610.4,
+          "trailing_stop": 617.5571428571428,
+          "exit_price": null,
+          "exit_time": null,
+          "exit_reason": null,
+          "pnl": null
+        }
+      ],
+      "last_price": 610.4,
+      "last_vwap": 617.4516189688178,
+      "last_updated": "09:48:00",
+      "series": [
+        {
+          "time": "09:48:00",
+          "price": 610.4,
+          "vwap": 617.45
+        }
+      ],
       "squared_off": false
     }
   }
