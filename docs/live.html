@@ -59,9 +59,218 @@ td.open-badge { color: var(--accent); font-weight: 600; }
 <div class="nav" style="color: var(--muted);">Backtest dashboard not generated yet</div>
 
     <h1>Live Straddle Basket Status
-      <span class="status-pill live">AWAITING STRIKES</span>
+      <span class="status-pill live">LIVE</span>
     </h1>
-    <div class="subtitle">2026-08-11 &middot; ATM - &middot; expiry - &middot; auto-refreshes every 60 seconds</div>
-    <div class="chart-box no-data">Strikes not fixed yet - waiting for 09:45 IST.</div>
+    <div class="subtitle">2026-08-11 &middot; ATM 24500 &middot; expiry 26811 &middot; auto-refreshes every 60 seconds</div>
+    
+    <div class="set-section">
+      <h2>Set A — 24400 / 24500 / 24600
+        <span class="status-pill live">LIVE</span>
+      </h2>
+      <div class="summary">
+        <div class="stat"><div class="label">Realized PnL</div>
+          <div class="value pos">&#8377;+0</div></div>
+        <div class="stat"><div class="label">Baskets Deployed</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Closed</div><div class="value">0</div></div>
+      </div>
+      <div class="chart-box">
+        <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
+          Last update: <b style="color:var(--text)">-</b> IST
+        </div>
+        <div style="font-size:14px;">Waiting for first price update...</div>
+      </div>
+      <div class="chart-box"><div id="chart-A" style="height:320px;"></div></div>
+      <div class="chart-box">
+        <table>
+          <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
+          <tbody><tr><td colspan="7" class="no-data">No entries yet today</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+    (function() {
+      const series = [];
+      const entries = [];
+      if (series.length === 0) return;
+
+      const times = series.map(b => b.time);
+      const priceVals = series.map(b => b.price);
+      const vwapVals = series.map(b => b.vwap);
+
+      const priceTrace = {
+        x: times, y: priceVals, type: 'scatter', mode: 'lines',
+        name: 'Combined Price', line: {color: '#4f8cff', width: 1.6}
+      };
+      const vwapTrace = {
+        x: times, y: vwapVals, type: 'scatter', mode: 'lines',
+        name: 'VWAP', line: {color: '#ffb84f', width: 1.6, dash: 'dot'}
+      };
+      const entryTrace = {
+        x: entries.map(e => e.entry_time), y: entries.map(e => e.entry_price),
+        type: 'scatter', mode: 'markers+text', name: 'Sell',
+        text: entries.map(e => '#' + e.basket_num),
+        textposition: 'top center', textfont: {color: '#ff5c5c', size: 10},
+        marker: {color: '#ff5c5c', size: 9, symbol: 'triangle-down'}
+      };
+      const exitTrace = {
+        x: entries.filter(e => e.exit_price != null).map(e => e.exit_time),
+        y: entries.filter(e => e.exit_price != null).map(e => e.exit_price),
+        type: 'scatter', mode: 'markers', name: 'Exit',
+        marker: {color: '#2ecc71', size: 8, symbol: 'triangle-up'}
+      };
+
+      const layout = {
+        title: {text: 'Set A — Combined Price vs VWAP', font: {color: '#e6e8ec', size: 13}},
+        paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
+        font: {color: '#8a90a0', size: 11},
+        margin: {l: 50, r: 20, t: 30, b: 30},
+        xaxis: {gridcolor: '#2a2f3a', nticks: 12}, yaxis: {gridcolor: '#2a2f3a'},
+        legend: {orientation: 'h', y: -0.25}
+      };
+      Plotly.newPlot('chart-A', [priceTrace, vwapTrace, entryTrace, exitTrace], layout,
+        {displayModeBar: false, responsive: true});
+    })();
+    </script>
+
+    <div class="set-section">
+      <h2>Set B — 24300 / 24400 / 24500
+        <span class="status-pill live">LIVE</span>
+      </h2>
+      <div class="summary">
+        <div class="stat"><div class="label">Realized PnL</div>
+          <div class="value pos">&#8377;+0</div></div>
+        <div class="stat"><div class="label">Baskets Deployed</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Closed</div><div class="value">0</div></div>
+      </div>
+      <div class="chart-box">
+        <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
+          Last update: <b style="color:var(--text)">-</b> IST
+        </div>
+        <div style="font-size:14px;">Waiting for first price update...</div>
+      </div>
+      <div class="chart-box"><div id="chart-B" style="height:320px;"></div></div>
+      <div class="chart-box">
+        <table>
+          <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
+          <tbody><tr><td colspan="7" class="no-data">No entries yet today</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+    (function() {
+      const series = [];
+      const entries = [];
+      if (series.length === 0) return;
+
+      const times = series.map(b => b.time);
+      const priceVals = series.map(b => b.price);
+      const vwapVals = series.map(b => b.vwap);
+
+      const priceTrace = {
+        x: times, y: priceVals, type: 'scatter', mode: 'lines',
+        name: 'Combined Price', line: {color: '#4f8cff', width: 1.6}
+      };
+      const vwapTrace = {
+        x: times, y: vwapVals, type: 'scatter', mode: 'lines',
+        name: 'VWAP', line: {color: '#ffb84f', width: 1.6, dash: 'dot'}
+      };
+      const entryTrace = {
+        x: entries.map(e => e.entry_time), y: entries.map(e => e.entry_price),
+        type: 'scatter', mode: 'markers+text', name: 'Sell',
+        text: entries.map(e => '#' + e.basket_num),
+        textposition: 'top center', textfont: {color: '#ff5c5c', size: 10},
+        marker: {color: '#ff5c5c', size: 9, symbol: 'triangle-down'}
+      };
+      const exitTrace = {
+        x: entries.filter(e => e.exit_price != null).map(e => e.exit_time),
+        y: entries.filter(e => e.exit_price != null).map(e => e.exit_price),
+        type: 'scatter', mode: 'markers', name: 'Exit',
+        marker: {color: '#2ecc71', size: 8, symbol: 'triangle-up'}
+      };
+
+      const layout = {
+        title: {text: 'Set B — Combined Price vs VWAP', font: {color: '#e6e8ec', size: 13}},
+        paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
+        font: {color: '#8a90a0', size: 11},
+        margin: {l: 50, r: 20, t: 30, b: 30},
+        xaxis: {gridcolor: '#2a2f3a', nticks: 12}, yaxis: {gridcolor: '#2a2f3a'},
+        legend: {orientation: 'h', y: -0.25}
+      };
+      Plotly.newPlot('chart-B', [priceTrace, vwapTrace, entryTrace, exitTrace], layout,
+        {displayModeBar: false, responsive: true});
+    })();
+    </script>
+
+    <div class="set-section">
+      <h2>Set C — 24500 / 24600 / 24700
+        <span class="status-pill live">LIVE</span>
+      </h2>
+      <div class="summary">
+        <div class="stat"><div class="label">Realized PnL</div>
+          <div class="value pos">&#8377;+0</div></div>
+        <div class="stat"><div class="label">Baskets Deployed</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Closed</div><div class="value">0</div></div>
+      </div>
+      <div class="chart-box">
+        <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
+          Last update: <b style="color:var(--text)">-</b> IST
+        </div>
+        <div style="font-size:14px;">Waiting for first price update...</div>
+      </div>
+      <div class="chart-box"><div id="chart-C" style="height:320px;"></div></div>
+      <div class="chart-box">
+        <table>
+          <thead><tr><th>#</th><th>Entry Time</th><th>Entry Price</th><th>Exit Time</th><th>Exit Price</th><th>Exit Reason</th><th>PnL</th></tr></thead>
+          <tbody><tr><td colspan="7" class="no-data">No entries yet today</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+    (function() {
+      const series = [];
+      const entries = [];
+      if (series.length === 0) return;
+
+      const times = series.map(b => b.time);
+      const priceVals = series.map(b => b.price);
+      const vwapVals = series.map(b => b.vwap);
+
+      const priceTrace = {
+        x: times, y: priceVals, type: 'scatter', mode: 'lines',
+        name: 'Combined Price', line: {color: '#4f8cff', width: 1.6}
+      };
+      const vwapTrace = {
+        x: times, y: vwapVals, type: 'scatter', mode: 'lines',
+        name: 'VWAP', line: {color: '#ffb84f', width: 1.6, dash: 'dot'}
+      };
+      const entryTrace = {
+        x: entries.map(e => e.entry_time), y: entries.map(e => e.entry_price),
+        type: 'scatter', mode: 'markers+text', name: 'Sell',
+        text: entries.map(e => '#' + e.basket_num),
+        textposition: 'top center', textfont: {color: '#ff5c5c', size: 10},
+        marker: {color: '#ff5c5c', size: 9, symbol: 'triangle-down'}
+      };
+      const exitTrace = {
+        x: entries.filter(e => e.exit_price != null).map(e => e.exit_time),
+        y: entries.filter(e => e.exit_price != null).map(e => e.exit_price),
+        type: 'scatter', mode: 'markers', name: 'Exit',
+        marker: {color: '#2ecc71', size: 8, symbol: 'triangle-up'}
+      };
+
+      const layout = {
+        title: {text: 'Set C — Combined Price vs VWAP', font: {color: '#e6e8ec', size: 13}},
+        paper_bgcolor: '#171a21', plot_bgcolor: '#171a21',
+        font: {color: '#8a90a0', size: 11},
+        margin: {l: 50, r: 20, t: 30, b: 30},
+        xaxis: {gridcolor: '#2a2f3a', nticks: 12}, yaxis: {gridcolor: '#2a2f3a'},
+        legend: {orientation: 'h', y: -0.25}
+      };
+      Plotly.newPlot('chart-C', [priceTrace, vwapTrace, entryTrace, exitTrace], layout,
+        {displayModeBar: false, responsive: true});
+    })();
+    </script>
 </body>
 </html>
