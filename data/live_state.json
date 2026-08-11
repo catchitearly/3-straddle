@@ -882,7 +882,7 @@
           "vwap": 350.15
         }
       ],
-      "squared_off": false
+      "squared_off": true
     },
     "B": {
       "strikes": [
@@ -1741,7 +1741,7 @@
           "vwap": 384.39
         }
       ],
-      "squared_off": false
+      "squared_off": true
     },
     "C": {
       "strikes": [
@@ -2672,7 +2672,7 @@
           "vwap": 472.79
         }
       ],
-      "squared_off": false
+      "squared_off": true
     }
   }
 }
