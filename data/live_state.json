@@ -1,16 +1,44 @@
 {
   "date": "2026-08-12",
-  "strike_fixed": false,
-  "atm_strike": null,
-  "all_strikes": null,
-  "all_leg_symbols": null,
-  "expiry": null,
+  "strike_fixed": true,
+  "atm_strike": 24400,
+  "all_strikes": [
+    24200,
+    24300,
+    24400,
+    24500,
+    24600
+  ],
+  "all_leg_symbols": [
+    "NSE:NIFTY2681824200CE",
+    "NSE:NIFTY2681824200PE",
+    "NSE:NIFTY2681824300CE",
+    "NSE:NIFTY2681824300PE",
+    "NSE:NIFTY2681824400CE",
+    "NSE:NIFTY2681824400PE",
+    "NSE:NIFTY2681824500CE",
+    "NSE:NIFTY2681824500PE",
+    "NSE:NIFTY2681824600CE",
+    "NSE:NIFTY2681824600PE"
+  ],
+  "expiry": "26818",
   "last_heartbeat_epoch": null,
   "last_dashboard_sent_epoch": null,
   "basket_sets": {
     "A": {
-      "strikes": null,
-      "symbols": null,
+      "strikes": [
+        24300,
+        24400,
+        24500
+      ],
+      "symbols": [
+        "NSE:NIFTY2681824300CE",
+        "NSE:NIFTY2681824300PE",
+        "NSE:NIFTY2681824400CE",
+        "NSE:NIFTY2681824400PE",
+        "NSE:NIFTY2681824500CE",
+        "NSE:NIFTY2681824500PE"
+      ],
       "was_below_vwap": false,
       "first_check_done": false,
       "last_evaluated_epoch": null,
@@ -23,8 +51,19 @@
       "squared_off": false
     },
     "B": {
-      "strikes": null,
-      "symbols": null,
+      "strikes": [
+        24200,
+        24300,
+        24400
+      ],
+      "symbols": [
+        "NSE:NIFTY2681824200CE",
+        "NSE:NIFTY2681824200PE",
+        "NSE:NIFTY2681824300CE",
+        "NSE:NIFTY2681824300PE",
+        "NSE:NIFTY2681824400CE",
+        "NSE:NIFTY2681824400PE"
+      ],
       "was_below_vwap": false,
       "first_check_done": false,
       "last_evaluated_epoch": null,
@@ -37,8 +76,19 @@
       "squared_off": false
     },
     "C": {
-      "strikes": null,
-      "symbols": null,
+      "strikes": [
+        24400,
+        24500,
+        24600
+      ],
+      "symbols": [
+        "NSE:NIFTY2681824400CE",
+        "NSE:NIFTY2681824400PE",
+        "NSE:NIFTY2681824500CE",
+        "NSE:NIFTY2681824500PE",
+        "NSE:NIFTY2681824600CE",
+        "NSE:NIFTY2681824600PE"
+      ],
       "was_below_vwap": false,
       "first_check_done": false,
       "last_evaluated_epoch": null,
