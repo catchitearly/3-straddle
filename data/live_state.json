@@ -975,7 +975,7 @@
           "vwap": 826.66
         }
       ],
-      "squared_off": false
+      "squared_off": true
     },
     "B": {
       "strikes": [
@@ -1819,7 +1819,7 @@
           "vwap": 867.35
         }
       ],
-      "squared_off": false
+      "squared_off": true
     },
     "C": {
       "strikes": [
@@ -1895,10 +1895,10 @@
           "entry_price": 850.7,
           "min_price": 780.25,
           "trailing_stop": 784.2571428571429,
-          "exit_price": null,
-          "exit_time": null,
-          "exit_reason": null,
-          "pnl": null
+          "exit_price": 775.0500000000001,
+          "exit_time": "15:15",
+          "exit_reason": "15:15 Time Exit",
+          "pnl": 4917.249999999998
         }
       ],
       "last_price": 780.4,
@@ -2711,7 +2711,7 @@
           "vwap": 844.96
         }
       ],
-      "squared_off": false
+      "squared_off": true
     }
   }
 }
