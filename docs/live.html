@@ -69,16 +69,16 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       </h2>
       <div class="summary">
         <div class="stat"><div class="label">Realized PnL</div>
-          <div class="value pos">&#8377;+0</div></div>
+          <div class="value neg">&#8377;-370</div></div>
         <div class="stat"><div class="label">Baskets Deployed</div><div class="value">1</div></div>
-        <div class="stat"><div class="label">Open</div><div class="value">1</div></div>
-        <div class="stat"><div class="label">Closed</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Closed</div><div class="value">1</div></div>
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">09:48:00</b> IST
+          Last update: <b style="color:var(--text)">09:50:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>741.65</b> vs VWAP <b>754.37</b></div>
+        <div style="font-size:14px;">Combined price: <b>747.35</b> vs VWAP <b>753.74</b></div>
       </div>
       <div class="chart-box"><div id="chart-A" style="height:320px;"></div></div>
       <div class="chart-box">
@@ -88,18 +88,18 @@ td.open-badge { color: var(--accent); font-weight: 600; }
             <td>#1</td>
             <td>09:48:00</td>
             <td>741.65</td>
-            <td>-</td>
-            <td>-</td>
-            <td><span class="open-badge">OPEN</span></td>
-            <td class="pnl-pos">-</td>
+            <td>09:50:00</td>
+            <td>747.35</td>
+            <td>Trailing Stop Hit (2.0x ATR)</td>
+            <td class="pnl-neg">-370.50</td>
         </tr></tbody>
         </table>
       </div>
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 741.65, "vwap": 754.37}];
-      const entries = [{"basket_num": 1, "entry_epoch": 1786594680, "entry_time": "09:48:00", "entry_price": 741.6500000000001, "min_price": 741.6500000000001, "trailing_stop": 745.6000000000001, "exit_price": null, "exit_time": null, "exit_reason": null, "pnl": null}];
+      const series = [{"time": "09:48:00", "price": 741.65, "vwap": 754.37}, {"time": "09:50:00", "price": 747.35, "vwap": 753.74}];
+      const entries = [{"basket_num": 1, "entry_epoch": 1786594680, "entry_time": "09:48:00", "entry_price": 741.6500000000001, "min_price": 741.6500000000001, "trailing_stop": 745.6000000000001, "exit_price": 747.35, "exit_time": "09:50:00", "exit_reason": "Trailing Stop Hit (2.0x ATR)", "pnl": -370.49999999999557}];
       if (series.length === 0) return;
 
       const times = series.map(b => b.time);
@@ -147,16 +147,16 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       </h2>
       <div class="summary">
         <div class="stat"><div class="label">Realized PnL</div>
-          <div class="value pos">&#8377;+0</div></div>
+          <div class="value neg">&#8377;-725</div></div>
         <div class="stat"><div class="label">Baskets Deployed</div><div class="value">1</div></div>
-        <div class="stat"><div class="label">Open</div><div class="value">1</div></div>
-        <div class="stat"><div class="label">Closed</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Open</div><div class="value">0</div></div>
+        <div class="stat"><div class="label">Closed</div><div class="value">1</div></div>
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">09:48:00</b> IST
+          Last update: <b style="color:var(--text)">09:50:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>861.85</b> vs VWAP <b>863.45</b></div>
+        <div style="font-size:14px;">Combined price: <b>873.00</b> vs VWAP <b>863.66</b></div>
       </div>
       <div class="chart-box"><div id="chart-B" style="height:320px;"></div></div>
       <div class="chart-box">
@@ -166,18 +166,18 @@ td.open-badge { color: var(--accent); font-weight: 600; }
             <td>#1</td>
             <td>09:48:00</td>
             <td>861.85</td>
-            <td>-</td>
-            <td>-</td>
-            <td><span class="open-badge">OPEN</span></td>
-            <td class="pnl-pos">-</td>
+            <td>09:50:00</td>
+            <td>873.00</td>
+            <td>Price > VWAP Exit</td>
+            <td class="pnl-neg">-724.75</td>
         </tr></tbody>
         </table>
       </div>
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 861.85, "vwap": 863.45}];
-      const entries = [{"basket_num": 1, "entry_epoch": 1786594680, "entry_time": "09:48:00", "entry_price": 861.85, "min_price": 861.85, "trailing_stop": 871.3642857142858, "exit_price": null, "exit_time": null, "exit_reason": null, "pnl": null}];
+      const series = [{"time": "09:48:00", "price": 861.85, "vwap": 863.45}, {"time": "09:50:00", "price": 873.0, "vwap": 863.66}];
+      const entries = [{"basket_num": 1, "entry_epoch": 1786594680, "entry_time": "09:48:00", "entry_price": 861.85, "min_price": 861.85, "trailing_stop": 871.3642857142858, "exit_price": 872.9999999999999, "exit_time": "09:50:00", "exit_reason": "Price > VWAP Exit", "pnl": -724.7499999999911}];
       if (series.length === 0) return;
 
       const times = series.map(b => b.time);
@@ -232,9 +232,9 @@ td.open-badge { color: var(--accent); font-weight: 600; }
       </div>
       <div class="chart-box">
         <div style="margin-bottom:8px; color: var(--muted); font-size: 13px;">
-          Last update: <b style="color:var(--text)">09:48:00</b> IST
+          Last update: <b style="color:var(--text)">09:50:00</b> IST
         </div>
-        <div style="font-size:14px;">Combined price: <b>699.65</b> vs VWAP <b>721.41</b></div>
+        <div style="font-size:14px;">Combined price: <b>698.45</b> vs VWAP <b>719.95</b></div>
       </div>
       <div class="chart-box"><div id="chart-C" style="height:320px;"></div></div>
       <div class="chart-box">
@@ -254,8 +254,8 @@ td.open-badge { color: var(--accent); font-weight: 600; }
     </div>
     <script>
     (function() {
-      const series = [{"time": "09:48:00", "price": 699.65, "vwap": 721.41}];
-      const entries = [{"basket_num": 1, "entry_epoch": 1786594680, "entry_time": "09:48:00", "entry_price": 699.65, "min_price": 699.65, "trailing_stop": 704.4714285714286, "exit_price": null, "exit_time": null, "exit_reason": null, "pnl": null}];
+      const series = [{"time": "09:48:00", "price": 699.65, "vwap": 721.41}, {"time": "09:50:00", "price": 698.45, "vwap": 719.95}];
+      const entries = [{"basket_num": 1, "entry_epoch": 1786594680, "entry_time": "09:48:00", "entry_price": 699.65, "min_price": 698.4499999999999, "trailing_stop": 703.4857142857143, "exit_price": null, "exit_time": null, "exit_reason": null, "pnl": null}];
       if (series.length === 0) return;
 
       const times = series.map(b => b.time);
