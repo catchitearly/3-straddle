@@ -41,7 +41,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1786957560,
+      "last_evaluated_epoch": 1786957680,
       "baskets_deployed": 6,
       "entries": [
         {
@@ -109,17 +109,17 @@
           "entry_epoch": 1786956720,
           "entry_time": "14:22:00",
           "entry_price": 442.00000000000006,
-          "min_price": 434.85,
-          "trailing_stop": 438.26428571428573,
+          "min_price": 433.25,
+          "trailing_stop": 435.82857142857137,
           "exit_price": null,
           "exit_time": null,
           "exit_reason": null,
           "pnl": null
         }
       ],
-      "last_price": 434.85,
-      "last_vwap": 444.12222456292164,
-      "last_updated": "14:36:00",
+      "last_price": 433.25,
+      "last_vwap": 444.05332363679804,
+      "last_updated": "14:38:00",
       "series": [
         {
           "time": "09:48:00",
@@ -845,6 +845,11 @@
           "time": "14:36:00",
           "price": 434.85,
           "vwap": 444.12
+        },
+        {
+          "time": "14:38:00",
+          "price": 433.25,
+          "vwap": 444.05
         }
       ],
       "squared_off": false
@@ -865,7 +870,7 @@
       ],
       "was_below_vwap": false,
       "first_check_done": true,
-      "last_evaluated_epoch": 1786957560,
+      "last_evaluated_epoch": 1786957680,
       "baskets_deployed": 1,
       "entries": [
         {
@@ -881,9 +886,9 @@
           "pnl": -779.9999999999964
         }
       ],
-      "last_price": 588.5999999999999,
-      "last_vwap": 529.8017123048991,
-      "last_updated": "14:36:00",
+      "last_price": 589.9499999999999,
+      "last_vwap": 530.0932443930694,
+      "last_updated": "14:38:00",
       "series": [
         {
           "time": "09:48:00",
@@ -1609,6 +1614,11 @@
           "time": "14:36:00",
           "price": 588.6,
           "vwap": 529.8
+        },
+        {
+          "time": "14:38:00",
+          "price": 589.95,
+          "vwap": 530.09
         }
       ],
       "squared_off": false
@@ -1629,7 +1639,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1786957560,
+      "last_evaluated_epoch": 1786957680,
       "baskets_deployed": 4,
       "entries": [
         {
@@ -1681,9 +1691,9 @@
           "pnl": 659.7499999999948
         }
       ],
-      "last_price": 414.20000000000005,
-      "last_vwap": 474.17709417226536,
-      "last_updated": "14:36:00",
+      "last_price": 410.9,
+      "last_vwap": 473.75476104977565,
+      "last_updated": "14:38:00",
       "series": [
         {
           "time": "09:48:00",
@@ -2409,6 +2419,11 @@
           "time": "14:36:00",
           "price": 414.2,
           "vwap": 474.18
+        },
+        {
+          "time": "14:38:00",
+          "price": 410.9,
+          "vwap": 473.75
         }
       ],
       "squared_off": false
