@@ -41,7 +41,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1787122860,
+      "last_evaluated_epoch": 1787122920,
       "baskets_deployed": 1,
       "entries": [
         {
@@ -57,9 +57,9 @@
           "pnl": -152.75000000000148
         }
       ],
-      "last_price": 757.6500000000001,
-      "last_vwap": 775.6073975895781,
-      "last_updated": "12:31:00",
+      "last_price": 758.3000000000001,
+      "last_vwap": 775.551751034553,
+      "last_updated": "12:32:00",
       "series": [
         {
           "time": "09:48:00",
@@ -465,6 +465,11 @@
           "time": "12:31:00",
           "price": 757.65,
           "vwap": 775.61
+        },
+        {
+          "time": "12:32:00",
+          "price": 758.3,
+          "vwap": 775.55
         }
       ],
       "squared_off": false
@@ -485,7 +490,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1787122860,
+      "last_evaluated_epoch": 1787122920,
       "baskets_deployed": 2,
       "entries": [
         {
@@ -513,9 +518,9 @@
           "pnl": 2119.0000000000014
         }
       ],
-      "last_price": 805.5999999999999,
-      "last_vwap": 835.0905234100107,
-      "last_updated": "12:31:00",
+      "last_price": 804.05,
+      "last_vwap": 834.9866926665915,
+      "last_updated": "12:32:00",
       "series": [
         {
           "time": "09:48:00",
@@ -921,6 +926,11 @@
           "time": "12:31:00",
           "price": 805.6,
           "vwap": 835.09
+        },
+        {
+          "time": "12:32:00",
+          "price": 804.05,
+          "vwap": 834.99
         }
       ],
       "squared_off": false
@@ -939,9 +949,9 @@
         "NSE:NIFTY26AUG24300CE",
         "NSE:NIFTY26AUG24300PE"
       ],
-      "was_below_vwap": true,
+      "was_below_vwap": false,
       "first_check_done": true,
-      "last_evaluated_epoch": 1787122860,
+      "last_evaluated_epoch": 1787122920,
       "baskets_deployed": 9,
       "entries": [
         {
@@ -1053,9 +1063,9 @@
           "pnl": 55.25000000000148
         }
       ],
-      "last_price": 789.0,
-      "last_vwap": 791.3730197844533,
-      "last_updated": "12:31:00",
+      "last_price": 792.55,
+      "last_vwap": 791.3742984561076,
+      "last_updated": "12:32:00",
       "series": [
         {
           "time": "09:48:00",
@@ -1455,6 +1465,11 @@
         {
           "time": "12:31:00",
           "price": 789.0,
+          "vwap": 791.37
+        },
+        {
+          "time": "12:32:00",
+          "price": 792.55,
           "vwap": 791.37
         }
       ],
