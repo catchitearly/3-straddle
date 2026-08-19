@@ -41,7 +41,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1787123640,
+      "last_evaluated_epoch": 1787123760,
       "baskets_deployed": 1,
       "entries": [
         {
@@ -57,9 +57,9 @@
           "pnl": -152.75000000000148
         }
       ],
-      "last_price": 752.8,
-      "last_vwap": 775.0500744761405,
-      "last_updated": "12:44:00",
+      "last_price": 756.9000000000001,
+      "last_vwap": 774.9334623316702,
+      "last_updated": "12:46:00",
       "series": [
         {
           "time": "09:48:00",
@@ -500,6 +500,11 @@
           "time": "12:44:00",
           "price": 752.8,
           "vwap": 775.05
+        },
+        {
+          "time": "12:46:00",
+          "price": 756.9,
+          "vwap": 774.93
         }
       ],
       "squared_off": false
@@ -520,7 +525,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1787123640,
+      "last_evaluated_epoch": 1787123760,
       "baskets_deployed": 2,
       "entries": [
         {
@@ -548,9 +553,9 @@
           "pnl": 2119.0000000000014
         }
       ],
-      "last_price": 806.7,
-      "last_vwap": 834.1598421745254,
-      "last_updated": "12:44:00",
+      "last_price": 804.8,
+      "last_vwap": 833.9624315761763,
+      "last_updated": "12:46:00",
       "series": [
         {
           "time": "09:48:00",
@@ -991,6 +996,11 @@
           "time": "12:44:00",
           "price": 806.7,
           "vwap": 834.16
+        },
+        {
+          "time": "12:46:00",
+          "price": 804.8,
+          "vwap": 833.96
         }
       ],
       "squared_off": false
@@ -1011,7 +1021,7 @@
       ],
       "was_below_vwap": true,
       "first_check_done": true,
-      "last_evaluated_epoch": 1787123640,
+      "last_evaluated_epoch": 1787123760,
       "baskets_deployed": 10,
       "entries": [
         {
@@ -1129,15 +1139,15 @@
           "entry_price": 789.8500000000001,
           "min_price": 779.0500000000001,
           "trailing_stop": 783.2285714285715,
-          "exit_price": null,
-          "exit_time": null,
-          "exit_reason": null,
-          "pnl": null
+          "exit_price": 790.55,
+          "exit_time": "12:46:00",
+          "exit_reason": "Trailing Stop Hit (2.0x ATR)",
+          "pnl": -45.49999999998818
         }
       ],
-      "last_price": 779.0500000000001,
-      "last_vwap": 791.2510838558183,
-      "last_updated": "12:44:00",
+      "last_price": 790.55,
+      "last_vwap": 791.2350438957292,
+      "last_updated": "12:46:00",
       "series": [
         {
           "time": "09:48:00",
@@ -1573,6 +1583,11 @@
           "time": "12:44:00",
           "price": 779.05,
           "vwap": 791.25
+        },
+        {
+          "time": "12:46:00",
+          "price": 790.55,
+          "vwap": 791.24
         }
       ],
       "squared_off": false
